@@ -36,29 +36,36 @@ public sealed class ModalForm(string title, string content = "") : Form.Value
 
     public void SubmitJSON(byte[]? response, Form.Submitter submitter, World.Tx tx)
     {
-        if (response is null)
+        try
         {
-            _onClose?.Invoke(submitter, tx);
-            return;
-        }
+            if (response is null)
+            {
+                FormCallbackRunner.Run(_onClose, submitter, tx);
+                return;
+            }
 
-        using var document = JsonDocument.Parse(response);
-        switch (document.RootElement.ValueKind)
+            using var document = JsonDocument.Parse(response);
+            switch (document.RootElement.ValueKind)
+            {
+                case JsonValueKind.True:
+                    FormCallbackRunner.Run(_onYes, submitter, tx);
+                    break;
+                case JsonValueKind.False:
+                    FormCallbackRunner.Run(_onNo, submitter, tx);
+                    break;
+                case JsonValueKind.Undefined:
+                case JsonValueKind.Object:
+                case JsonValueKind.Array:
+                case JsonValueKind.String:
+                case JsonValueKind.Number:
+                case JsonValueKind.Null:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        catch (Exception exception)
         {
-            case JsonValueKind.True:
-                _onYes?.Invoke(submitter, tx);
-                break;
-            case JsonValueKind.False:
-                _onNo?.Invoke(submitter, tx);
-                break;
-            case JsonValueKind.Undefined:
-            case JsonValueKind.Object:
-            case JsonValueKind.Array:
-            case JsonValueKind.String:
-            case JsonValueKind.Number:
-            case JsonValueKind.Null:
-            default:
-                throw new ArgumentOutOfRangeException();
+            FormCallbackRunner.Report(exception);
         }
     }
 

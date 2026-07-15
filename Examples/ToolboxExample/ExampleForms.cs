@@ -14,9 +14,9 @@ internal static class ExampleForms
     {
         var form = FormFactory.CreateSimpleForm("Toolbox")
             .SetContent("Choisis une fonctionnalite a tester.")
-            .AddButton("Items + NBT", (_, _) => ExampleCommands.GiveItems(player))
-            .AddButton("UI", (_, _) => ExampleCommands.ShowUi(player))
-            .AddButton("Custom form", (_, _) => OpenSettings(player, state))
+            .AddButton("Items + NBT", (submitter, _) => RunForPlayer(submitter, ExampleCommands.GiveItems))
+            .AddButton("UI", (submitter, _) => RunForPlayer(submitter, ExampleCommands.ShowUi))
+            .AddButton("Custom form", (submitter, _) => RunForPlayer(submitter, submittedPlayer => OpenSettings(submittedPlayer, state)))
             .AddButton("Fermer", (submitter, _) =>
             {
                 if (submitter is Player submittedPlayer)
@@ -62,14 +62,22 @@ internal static class ExampleForms
     public static void OpenConfirmReset(Player player, ExampleState state)
     {
         var form = FormFactory.CreateModalForm("Toolbox task", "Arreter la task repetitive ?")
-            .SetButton1("Oui", (_, _) =>
+            .SetButton1("Oui", (submitter, _) => RunForPlayer(submitter, submittedPlayer =>
             {
                 state.StopRepeatingTask();
-                PlayerApi.SendMessage(player, "Task repetitive arretee.");
-            })
-            .SetButton2("Non", (_, _) => PlayerApi.SendMessage(player, "Task conservee."));
+                PlayerApi.SendMessage(submittedPlayer, "Task repetitive arretee.");
+            }))
+            .SetButton2("Non", (submitter, _) => RunForPlayer(submitter, submittedPlayer => PlayerApi.SendMessage(submittedPlayer, "Task conservee.")));
 
         FormFactory.SendForm(player, form);
+    }
+
+    private static void RunForPlayer(Form.Submitter submitter, Action<Player> action)
+    {
+        if (submitter is Player submittedPlayer)
+        {
+            action(submittedPlayer);
+        }
     }
 
     private static void PlaySelectedSound(Player player, string sound)

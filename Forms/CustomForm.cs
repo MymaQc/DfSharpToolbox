@@ -36,27 +36,34 @@ public sealed class CustomForm(string title) : Form.Value
 
     public void SubmitJSON(byte[]? response, Form.Submitter submitter, World.Tx tx)
     {
-        if (response is null)
+        try
         {
-            _onClose?.Invoke(submitter, tx);
-            return;
-        }
+            if (response is null)
+            {
+                FormCallbackRunner.Run(_onClose, submitter, tx);
+                return;
+            }
 
-        using var document = JsonDocument.Parse(response);
-        if (document.RootElement.ValueKind != JsonValueKind.Array)
+            using var document = JsonDocument.Parse(response);
+            if (document.RootElement.ValueKind != JsonValueKind.Array)
+            {
+                return;
+            }
+
+            var values = new Dictionary<string, object?>(StringComparer.Ordinal);
+            var options = new Dictionary<string, string[]>(StringComparer.Ordinal);
+
+            for (var index = 0; index < _elements.Count && index < document.RootElement.GetArrayLength(); index++)
+            {
+                _elements[index].Read(document.RootElement[index], values, options);
+            }
+
+            FormCallbackRunner.Run(_onSubmit, new CustomFormResponse(values, options), submitter, tx);
+        }
+        catch (Exception exception)
         {
-            return;
+            FormCallbackRunner.Report(exception);
         }
-
-        var values = new Dictionary<string, object?>(StringComparer.Ordinal);
-        var options = new Dictionary<string, string[]>(StringComparer.Ordinal);
-
-        for (var index = 0; index < _elements.Count && index < document.RootElement.GetArrayLength(); index++)
-        {
-            _elements[index].Read(document.RootElement[index], values, options);
-        }
-
-        _onSubmit?.Invoke(new CustomFormResponse(values, options), submitter, tx);
     }
 
     public CustomForm AddLabel(string text)

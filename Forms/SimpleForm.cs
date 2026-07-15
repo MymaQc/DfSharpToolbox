@@ -38,21 +38,28 @@ public sealed class SimpleForm(string title) : Form.Value
 
     public void SubmitJSON(byte[]? response, Form.Submitter submitter, World.Tx tx)
     {
-        if (response is null)
+        try
         {
-            _onClose?.Invoke(submitter, tx);
-            return;
-        }
+            if (response is null)
+            {
+                FormCallbackRunner.Run(_onClose, submitter, tx);
+                return;
+            }
 
-        using var document = JsonDocument.Parse(response);
-        if (!document.RootElement.TryGetInt32(out var index))
-        {
-            return;
-        }
+            using var document = JsonDocument.Parse(response);
+            if (!document.RootElement.TryGetInt32(out var index))
+            {
+                return;
+            }
 
-        if ((uint)index < (uint)_buttons.Count)
+            if ((uint)index < (uint)_buttons.Count)
+            {
+                FormCallbackRunner.Run(_buttons[index].OnClick, submitter, tx);
+            }
+        }
+        catch (Exception exception)
         {
-            _buttons[index].OnClick(submitter, tx);
+            FormCallbackRunner.Report(exception);
         }
     }
 
