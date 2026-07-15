@@ -1,4 +1,5 @@
 using Dragonfly;
+using Toolbox.Diagnostics;
 using Toolbox.Timing;
 
 namespace Toolbox.Tasks;
@@ -9,14 +10,14 @@ public static class TaskApi
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(callback);
-        return new ToolboxTask(world.Do(callback));
+        return new ToolboxTask(world.Do(ToolboxLogger.Wrap(callback, "Task")));
     }
 
     public static ToolboxTask RunTaskLater(World world, TimeSpan delay, Action<World.Tx> callback)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(callback);
-        return new ToolboxTask(world.DoAfter(delay, callback));
+        return new ToolboxTask(world.DoAfter(delay, ToolboxLogger.Wrap(callback, "Delayed task")));
     }
 
     public static ToolboxTask RunTaskLaterTicks(World world, long delayTicks, Action<World.Tx> callback)

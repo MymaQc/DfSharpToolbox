@@ -1,3 +1,5 @@
+using Toolbox.Diagnostics;
+
 namespace Toolbox.Events;
 
 public sealed class EventManager
@@ -34,7 +36,7 @@ public sealed class EventManager
 
         foreach (var handler in exactHandlers)
         {
-            ((Action<TEvent>)handler)(ev);
+            ToolboxLogger.Try(() => ((Action<TEvent>)handler)(ev), $"Event {ev.GetType().Name}");
         }
     }
 

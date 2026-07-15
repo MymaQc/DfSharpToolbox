@@ -1,4 +1,5 @@
 using Dragonfly;
+using Toolbox.Diagnostics;
 
 namespace Toolbox.Tasks;
 
@@ -72,7 +73,7 @@ public sealed class RepeatingToolboxTask
             return;
         }
 
-        _callback(tx);
+        ToolboxLogger.Try(() => _callback(tx), "Repeating task");
         Schedule(_period);
     }
 }

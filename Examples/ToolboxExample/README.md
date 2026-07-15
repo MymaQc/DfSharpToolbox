@@ -15,3 +15,9 @@ Commandes utiles:
 - `/tbxkit <count> [name]`: exemple de commande avec parametres.
 - `/tbxeffect <speed|jumpboost|nightvision> [seconds]`: autre commande avec parametres.
 - `/tbxecho <message...>`: exemple de `Cmd.Varargs`.
+
+Logs:
+
+- Toolbox ecrit les erreurs dans la console du serveur.
+- Toolbox ecrit aussi les erreurs dans `logs/toolbox-errors.log`, depuis le dossier ou le serveur est lance.
+- Les forms, commandes, events et tasks sont proteges pour eviter qu'une exception C# disparaisse sans trace.

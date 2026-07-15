@@ -1,4 +1,5 @@
 using Dragonfly;
+using Toolbox.Diagnostics;
 
 namespace Toolbox.Forms;
 
@@ -40,6 +41,6 @@ internal static class FormCallbackRunner
 
     public static void Report(Exception exception)
     {
-        Console.Error.WriteLine(exception);
+        ToolboxLogger.Error(exception, "Form callback");
     }
 }

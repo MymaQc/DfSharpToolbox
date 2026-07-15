@@ -1,4 +1,5 @@
 using Dragonfly;
+using Toolbox.Diagnostics;
 using Toolbox.Events;
 using DPacketContext = Dragonfly.Packet.Context;
 using DPacket = Dragonfly.Packet.Packet;
@@ -13,6 +14,7 @@ public abstract class ToolboxPlugin : Plugin
 
     protected ToolboxPlugin()
     {
+        ToolboxLogger.Initialize();
         _events = new EventManager();
         _eventDispatcher = new ToolboxEventDispatcher(_events);
     }
