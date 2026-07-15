@@ -2,5 +2,6 @@
   <Project Path="../../Lib/plugins/csharp/Dragonfly.Generator/Dragonfly.Generator.csproj" />
   <Project Path="../../Lib/plugins/csharp/Dragonfly.Native/Dragonfly.Native.csproj" />
   <Project Path="../../Lib/plugins/csharp/Dragonfly/Dragonfly.csproj" />
+  <Project Path="Examples/ToolboxExample/ToolboxExample.csproj" />
   <Project Path="Toolbox.csproj" />
 </Solution>
