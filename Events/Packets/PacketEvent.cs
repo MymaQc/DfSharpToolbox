@@ -17,7 +17,7 @@ public abstract class PacketEvent(DPacketContext context, DPacket packet) : Canc
 
     private uint PacketId => Packet.ID();
 
-    private string PacketName => PacketApi.GetName(Packet);
+    private string PacketName => PacketApi.GetPacketName(Packet);
 
     public DPacketContext GetContext()
     {
@@ -29,7 +29,7 @@ public abstract class PacketEvent(DPacketContext context, DPacket packet) : Canc
         return Packet;
     }
 
-    public string GetXuid()
+    public string GetContextXuid()
     {
         return Xuid;
     }
@@ -44,101 +44,96 @@ public abstract class PacketEvent(DPacketContext context, DPacket packet) : Canc
         return PacketName;
     }
 
-    public bool Is<TPacket>() where TPacket : class, DPacket
+    public bool IsPacket<TPacket>() where TPacket : class, DPacket
     {
-        return PacketApi.Is<TPacket>(Packet);
+        return PacketApi.IsPacket<TPacket>(Packet);
     }
 
-    public TPacket? As<TPacket>() where TPacket : class, DPacket
+    public TPacket? AsPacket<TPacket>() where TPacket : class, DPacket
     {
-        return PacketApi.As<TPacket>(Packet);
+        return PacketApi.AsPacket<TPacket>(Packet);
     }
 
-    public TPacket Get<TPacket>() where TPacket : class, DPacket
+    public TPacket RequirePacket<TPacket>() where TPacket : class, DPacket
     {
-        return PacketApi.Get<TPacket>(Packet);
+        return PacketApi.RequirePacket<TPacket>(Packet);
     }
 
-    private bool TryGet<TPacket>(out TPacket packet) where TPacket : class, DPacket
+    public bool TryGetPacket<TPacket>(out TPacket packet) where TPacket : class, DPacket
     {
-        return PacketApi.TryGet(Packet, out packet);
+        return PacketApi.TryGetPacket(Packet, out packet);
     }
 
-    public bool TryAs<TPacket>(out TPacket packet) where TPacket : class, DPacket
+    public void EditPacket<TPacket>(Action<TPacket> editor) where TPacket : class, DPacket
     {
-        return TryGet(out packet);
+        PacketApi.EditPacket(Packet, editor);
     }
 
-    public void Edit<TPacket>(Action<TPacket> editor) where TPacket : class, DPacket
+    public bool TryEditPacket<TPacket>(Action<TPacket> editor, out Exception? exception) where TPacket : class, DPacket
     {
-        PacketApi.Edit(Packet, editor);
+        return PacketApi.TryEditPacket(Packet, editor, out exception);
     }
 
-    public bool TryEdit<TPacket>(Action<TPacket> editor, out Exception? exception) where TPacket : class, DPacket
+    private IReadOnlyList<PacketFieldSnapshot> InspectPacketFields()
     {
-        return PacketApi.TryEdit(Packet, editor, out exception);
+        return PacketApi.InspectPacketFields(Packet);
     }
 
-    private IReadOnlyList<PacketFieldSnapshot> Inspect()
+    public IReadOnlyList<PacketFieldSnapshot> GetPacketFields()
     {
-        return PacketApi.Inspect(Packet);
+        return InspectPacketFields();
     }
 
-    public IReadOnlyList<PacketFieldSnapshot> GetFields()
+    public object? GetPacketField(string name)
     {
-        return Inspect();
+        return PacketApi.GetPacketField(Packet, name);
     }
 
-    public object? GetField(string name)
+    public bool TryGetPacketField(string name, out object? value, out Exception? exception)
     {
-        return PacketApi.GetField(Packet, name);
+        return PacketApi.TryGetPacketField(Packet, name, out value, out exception);
     }
 
-    public bool TryGetField(string name, out object? value, out Exception? exception)
+    public void SetPacketField(string name, object? value)
     {
-        return PacketApi.TryGetField(Packet, name, out value, out exception);
+        PacketApi.SetPacketField(Packet, name, value);
     }
 
-    public void SetField(string name, object? value)
+    public bool TrySetPacketField(string name, object? value, out Exception? exception)
     {
-        PacketApi.SetField(Packet, name, value);
+        return PacketApi.TrySetPacketField(Packet, name, value, out exception);
     }
 
-    public bool TrySetField(string name, object? value, out Exception? exception)
+    public void SendPacketTo(DPlayer player)
     {
-        return PacketApi.TrySetField(Packet, name, value, out exception);
+        PacketApi.SendPacket(player, Packet);
     }
 
-    private void SendTo(DPlayer player)
+    public void SendPacketTo(IEnumerable<DPlayer> players)
     {
-        PacketApi.Send(player, Packet);
+        PacketApi.SendPacketToPlayers(players, Packet);
     }
 
-    private void SendTo(IEnumerable<DPlayer> players)
+    public void SendPacketTo(DWorld.Tx tx)
     {
-        PacketApi.SendTo(players, Packet);
+        PacketApi.SendPacketToWorldPlayers(tx, Packet);
     }
 
-    private void SendTo(DWorld.Tx tx)
-    {
-        PacketApi.SendTo(tx, Packet);
-    }
-
-    public void CancelAndSendTo(DPlayer player)
+    public void CancelAndSendPacketTo(DPlayer player)
     {
         Cancel();
-        SendTo(player);
+        SendPacketTo(player);
     }
 
-    public void CancelAndSendTo(IEnumerable<DPlayer> players)
+    public void CancelAndSendPacketTo(IEnumerable<DPlayer> players)
     {
         Cancel();
-        SendTo(players);
+        SendPacketTo(players);
     }
 
-    public void CancelAndSendTo(DWorld.Tx tx)
+    public void CancelAndSendPacketTo(DWorld.Tx tx)
     {
         Cancel();
-        SendTo(tx);
+        SendPacketTo(tx);
     }
 }

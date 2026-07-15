@@ -45,13 +45,13 @@ public sealed class ItemStackBuilder(Item.Stack stack)
 
     public ItemStackBuilder SetTag(string key, object value)
     {
-        _stack = ItemNbtApi.Set(_stack, key, value);
+        _stack = ItemNbtApi.SetTag(_stack, key, value);
         return this;
     }
 
     public ItemStackBuilder RemoveTag(string key)
     {
-        _stack = ItemNbtApi.Remove(_stack, key);
+        _stack = ItemNbtApi.RemoveTag(_stack, key);
         return this;
     }
 

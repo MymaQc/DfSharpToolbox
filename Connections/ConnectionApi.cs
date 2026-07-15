@@ -4,17 +4,17 @@ namespace Toolbox.Connections;
 
 public static class ConnectionApi
 {
-    public static string GetNetwork(Net.Addr address)
+    public static string GetAddressNetwork(Net.Addr address)
     {
         return address.Network();
     }
 
-    public static string GetAddress(Net.Addr address)
+    public static string GetAddressText(Net.Addr address)
     {
         return address.String();
     }
 
-    public static string GetXuid(Login.IdentityData identity)
+    public static string GetIdentityXuid(Login.IdentityData identity)
     {
         return identity.XUID;
     }
@@ -24,7 +24,7 @@ public static class ConnectionApi
         return identity.DisplayName;
     }
 
-    public static string GetIdentity(Login.IdentityData identity)
+    public static string GetIdentityId(Login.IdentityData identity)
     {
         return identity.Identity;
     }
@@ -44,7 +44,7 @@ public static class ConnectionApi
         return client.DeviceOS;
     }
 
-    public static string GetDeviceName(Login.ClientData client)
+    public static string GetDeviceOsName(Login.ClientData client)
     {
         return client.DeviceOS.ToString();
     }
@@ -54,22 +54,33 @@ public static class ConnectionApi
         return string.Equals(client.GameVersion, version, StringComparison.OrdinalIgnoreCase);
     }
 
+    public static ConnectionDeviceFamily GetDeviceFamily(Login.ClientData client)
+    {
+        return client.DeviceOS switch
+        {
+            Protocol.DeviceOS.Android or Protocol.DeviceOS.IOS or Protocol.DeviceOS.FireOS => ConnectionDeviceFamily.Mobile,
+            Protocol.DeviceOS.Win10 or Protocol.DeviceOS.Win32 or Protocol.DeviceOS.OSX or Protocol.DeviceOS.Linux => ConnectionDeviceFamily.Desktop,
+            Protocol.DeviceOS.XBOX or Protocol.DeviceOS.Orbis or Protocol.DeviceOS.NX => ConnectionDeviceFamily.Console,
+            _ => ConnectionDeviceFamily.Unknown,
+        };
+    }
+
     public static bool IsMobile(Login.ClientData client)
     {
-        return client.DeviceOS is Protocol.DeviceOS.Android or Protocol.DeviceOS.IOS or Protocol.DeviceOS.FireOS;
+        return GetDeviceFamily(client) == ConnectionDeviceFamily.Mobile;
     }
 
     public static bool IsDesktop(Login.ClientData client)
     {
-        return client.DeviceOS is Protocol.DeviceOS.Win10 or Protocol.DeviceOS.Win32 or Protocol.DeviceOS.OSX or Protocol.DeviceOS.Linux;
+        return GetDeviceFamily(client) == ConnectionDeviceFamily.Desktop;
     }
 
     public static bool IsConsole(Login.ClientData client)
     {
-        return client.DeviceOS is Protocol.DeviceOS.XBOX or Protocol.DeviceOS.Orbis or Protocol.DeviceOS.NX;
+        return GetDeviceFamily(client) == ConnectionDeviceFamily.Console;
     }
 
-    public static bool HasXuid(Login.IdentityData identity)
+    public static bool HasIdentityXuid(Login.IdentityData identity)
     {
         return !string.IsNullOrWhiteSpace(identity.XUID);
     }

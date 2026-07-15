@@ -39,7 +39,7 @@ public abstract class ToolboxPlugin : Plugin
             return;
         }
 
-        _events.Clear();
+        _events.ClearListeners();
         _disabled = true;
     }
 

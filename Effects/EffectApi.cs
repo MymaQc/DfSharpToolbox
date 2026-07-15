@@ -1,12 +1,11 @@
 using Dragonfly;
+using Toolbox.Timing;
 
 namespace Toolbox.Effects;
 
 public static class EffectApi
 {
-    private static readonly TimeSpan TickDuration = TimeSpan.FromMilliseconds(50);
-
-    public static Effect.Value Create(Effect.LastingType type, int level, TimeSpan duration, bool hideParticles = false, bool ambient = false)
+    private static Effect.Value Create(Effect.LastingType type, int level, TimeSpan duration, bool hideParticles = false, bool ambient = false)
     {
         var effect = ambient
             ? Effect.NewAmbient(type, level, duration)
@@ -14,23 +13,23 @@ public static class EffectApi
         return hideParticles ? effect.WithoutParticles() : effect;
     }
 
-    public static Effect.Value CreateTicks(Effect.LastingType type, int level, long ticks, bool hideParticles = false, bool ambient = false)
+    public static Effect.Value CreateEffectTicks(Effect.LastingType type, int level, long ticks, bool hideParticles = false, bool ambient = false)
     {
-        return Create(type, level, Ticks(ticks), hideParticles, ambient);
+        return Create(type, level, TimeApi.ConvertGameTicksToDuration(ticks), hideParticles, ambient);
     }
 
-    public static Effect.Value Infinite(Effect.LastingType type, int level, bool hideParticles = false)
+    public static Effect.Value CreateInfiniteEffect(Effect.LastingType type, int level, bool hideParticles = false)
     {
         var effect = Effect.NewInfinite(type, level);
         return hideParticles ? effect.WithoutParticles() : effect;
     }
 
-    public static Effect.Value Instant(Effect.Type type, int level, double potency = 1)
+    public static Effect.Value CreateInstantEffect(Effect.Type type, int level, double potency = 1)
     {
         return Effect.NewInstantWithPotency(type, level, potency);
     }
 
-    public static Effect.Value HideParticles(Effect.Value effect)
+    public static Effect.Value HideEffectParticles(Effect.Value effect)
     {
         return effect.WithoutParticles();
     }
@@ -60,22 +59,22 @@ public static class EffectApi
         return effect.Infinite();
     }
 
-    public static int GetTick(Effect.Value effect)
+    public static int GetEffectTick(Effect.Value effect)
     {
         return effect.Tick();
     }
 
-    public static Effect.Type? GetType(Effect.Value effect)
+    public static Effect.Type? GetEffectType(Effect.Value effect)
     {
         return effect.Type();
     }
 
-    public static (Effect.Type? Type, bool Ok) GetById(int id)
+    public static (Effect.Type? Type, bool Ok) GetEffectTypeById(int id)
     {
         return Effect.ByID(id);
     }
 
-    public static Effect.Type RequireById(int id)
+    public static Effect.Type RequireEffectTypeById(int id)
     {
         var (type, ok) = Effect.ByID(id);
         if (!ok || type is null)
@@ -86,7 +85,7 @@ public static class EffectApi
         return type;
     }
 
-    public static (int Id, bool Ok) GetId(Effect.Type type)
+    public static (int Id, bool Ok) GetEffectTypeId(Effect.Type type)
     {
         return Effect.ID(type);
     }
@@ -101,8 +100,33 @@ public static class EffectApi
         return Effect.ResultingColour(effects);
     }
 
-    public static TimeSpan Ticks(long ticks)
+    public static void AddEffect(Player player, Effect.Value effect)
     {
-        return TimeSpan.FromTicks(checked(TickDuration.Ticks * System.Math.Max(0, ticks)));
+        player.AddEffect(effect);
+    }
+
+    public static void RemoveEffect(Player player, Effect.Type effect)
+    {
+        player.RemoveEffect(effect);
+    }
+
+    public static (Effect.Value Effect, bool Ok) GetEffect(Player player, Effect.Type effect)
+    {
+        return player.Effect(effect);
+    }
+
+    public static bool HasEffect(Player player, Effect.Type effect)
+    {
+        return player.Effect(effect).Ok;
+    }
+
+    public static IReadOnlyList<Effect.Value> GetEffects(Player player)
+    {
+        return player.Effects();
+    }
+
+    public static TimeSpan ConvertTicksToDuration(long ticks)
+    {
+        return TimeApi.ConvertGameTicksToDuration(ticks);
     }
 }

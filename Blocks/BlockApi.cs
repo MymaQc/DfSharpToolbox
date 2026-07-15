@@ -4,7 +4,7 @@ namespace Toolbox.Blocks;
 
 public static class BlockApi
 {
-    public static World.SetOpts Options(bool disableBlockUpdates = false, bool disableLiquidDisplacement = false, bool disableRedstoneUpdates = false)
+    public static World.SetOpts CreateSetOptions(bool disableBlockUpdates = false, bool disableLiquidDisplacement = false, bool disableRedstoneUpdates = false)
     {
         return new World.SetOpts
         {
@@ -14,14 +14,14 @@ public static class BlockApi
         };
     }
 
-    public static (World.Block? Block, bool Ok) FromName(string name, Dictionary<string, object?>? states = null)
+    public static (World.Block? Block, bool Ok) GetBlockByName(string name, Dictionary<string, object?>? states = null)
     {
-        return BlockFactory.FromName(name, states);
+        return BlockFactory.GetBlockByName(name, states);
     }
 
-    public static World.Block Require(string name, Dictionary<string, object?>? states = null)
+    public static World.Block RequireBlockByName(string name, Dictionary<string, object?>? states = null)
     {
-        return BlockFactory.Require(name, states);
+        return BlockFactory.RequireBlockByName(name, states);
     }
 
     public static Cube.Range GetRange(World.Tx tx)
@@ -54,7 +54,7 @@ public static class BlockApi
         tx.SetBlock(position, null, options);
     }
 
-    public static IEnumerable<Cube.Pos> FindNearby(World.Tx tx, Cube.Pos center, int radius, params World.Block[] blocks)
+    public static IEnumerable<Cube.Pos> FindNearbyBlocks(World.Tx tx, Cube.Pos center, int radius, params World.Block[] blocks)
     {
         return tx.BlocksWithin(center, radius, blocks);
     }
@@ -74,7 +74,7 @@ public static class BlockApi
         tx.SetLiquid(position, null);
     }
 
-    public static void ScheduleUpdate(World.Tx tx, Cube.Pos position, World.Block block, TimeSpan delay)
+    public static void ScheduleBlockUpdate(World.Tx tx, Cube.Pos position, World.Block block, TimeSpan delay)
     {
         tx.ScheduleBlockUpdate(position, block, delay);
     }
@@ -139,23 +139,4 @@ public static class BlockApi
         return tx.Thundering();
     }
 
-    public static void AddParticle(World.Tx tx, Vector3 position, World.Particle particle)
-    {
-        tx.AddParticle(position, particle);
-    }
-
-    public static Cube.Pos FromVector(Vector3 position)
-    {
-        return Cube.PosFromVec3(position);
-    }
-
-    public static Cube.Pos Add(Cube.Pos position, int x = 0, int y = 0, int z = 0)
-    {
-        return position.Add(new Cube.Pos(x, y, z));
-    }
-
-    public static Cube.Pos GetSide(Cube.Pos position, Cube.Face face)
-    {
-        return position.Side(face);
-    }
 }

@@ -20,6 +20,36 @@ public static class InventoryApi
         return player.Armour();
     }
 
+    public static int GiveItem(Player player, Item.Stack item)
+    {
+        return player.Inventory().AddItem(item);
+    }
+
+    public static Item.Stack GetItem(Player player, int slot)
+    {
+        return player.Inventory().Item(slot);
+    }
+
+    public static void SetItem(Player player, int slot, Item.Stack item)
+    {
+        player.Inventory().SetItem(slot, item);
+    }
+
+    public static (Item.Stack MainHand, Item.Stack OffHand) GetHeldItems(Player player)
+    {
+        return player.HeldItems();
+    }
+
+    public static void SetHeldItems(Player player, Item.Stack mainHand, Item.Stack offHand)
+    {
+        player.SetHeldItems(mainHand, offHand);
+    }
+
+    public static void SetHeldSlot(Player player, int slot)
+    {
+        player.SetHeldSlot(slot);
+    }
+
     public static int GetSize(Inventory.Value inventory)
     {
         return inventory.Size();
@@ -53,12 +83,12 @@ public static class InventoryApi
         }
     }
 
-    public static void ClearSlot(Inventory.Value inventory, int slot)
+    public static void ClearInventorySlot(Inventory.Value inventory, int slot)
     {
         inventory.SetItem(slot, default);
     }
 
-    public static void Clear(Inventory.Value inventory)
+    public static void ClearInventory(Inventory.Value inventory)
     {
         for (var slot = 0; slot < inventory.Size(); slot++)
         {
@@ -111,13 +141,23 @@ public static class InventoryApi
         armor.SetBoots(boots);
     }
 
-    public static void SetArmor(Inventory.Armour armor, Item.Stack helmet, Item.Stack chestplate, Item.Stack leggings, Item.Stack boots)
+    private static void SetArmor(Inventory.Armour armor, Item.Stack helmet, Item.Stack chestplate, Item.Stack leggings, Item.Stack boots)
     {
         armor.Set(helmet, chestplate, leggings, boots);
     }
 
-    public static void SetArmor(Inventory.Armour armor, ArmorSet armorSet)
+    private static void SetArmor(Inventory.Armour armor, ArmorSet armorSet)
     {
         armor.Set(armorSet.Helmet, armorSet.Chestplate, armorSet.Leggings, armorSet.Boots);
+    }
+
+    public static void SetArmor(Player player, Item.Stack helmet, Item.Stack chestplate, Item.Stack leggings, Item.Stack boots)
+    {
+        SetArmor(player.Armour(), helmet, chestplate, leggings, boots);
+    }
+
+    public static void SetArmor(Player player, ArmorSet armorSet)
+    {
+        SetArmor(player.Armour(), armorSet);
     }
 }

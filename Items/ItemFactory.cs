@@ -4,56 +4,63 @@ namespace Toolbox.Items;
 
 public static class ItemFactory
 {
-
-    public static Item.Stack Air()
+    public static Item.Stack CreateAir()
     {
         return default;
     }
 
-    public static Item.Stack Create(World.Item item, int count = 1)
+    private static Item.Stack CreateStack(World.Item item, int count = 1)
     {
         return Item.NewStack(item, count);
     }
 
-    public static ItemStackBuilder Builder(World.Item item, int count = 1)
+    public static ItemStackBuilder CreateBuilder(World.Item item, int count = 1)
     {
-        return new ItemStackBuilder(Create(item, count));
+        return new ItemStackBuilder(CreateStack(item, count));
     }
 
-    public static Item.Stack DiamondSword(int count = 1)
+    public static Item.Stack CreateDiamondSword(int count = 1)
     {
-        return Create(new Item.Sword(Item.ToolTierDiamond), count);
+        return CreateStack(new Item.Sword(Item.ToolTierDiamond), count);
     }
 
-    public static Item.Stack NetheriteSword(int count = 1)
+    public static Item.Stack CreateNetheriteSword(int count = 1)
     {
-        return Create(new Item.Sword(Item.ToolTierNetherite), count);
+        return CreateStack(new Item.Sword(Item.ToolTierNetherite), count);
     }
 
-    public static Item.Stack DiamondPickaxe(int count = 1)
+    public static Item.Stack CreateDiamondPickaxe(int count = 1)
     {
-        return Create(new Item.Pickaxe(Item.ToolTierDiamond), count);
+        return CreateStack(new Item.Pickaxe(Item.ToolTierDiamond), count);
     }
 
-    public static Item.Stack NetheritePickaxe(int count = 1)
+    public static Item.Stack CreateNetheritePickaxe(int count = 1)
     {
-        return Create(new Item.Pickaxe(Item.ToolTierNetherite), count);
+        return CreateStack(new Item.Pickaxe(Item.ToolTierNetherite), count);
     }
 
-    public static Item.Stack Totem(int count = 1)
+    public static Item.Stack CreateTotem(int count = 1)
     {
-        return Create(new Item.Totem(), count);
+        return CreateStack(new Item.Totem(), count);
     }
 
-    public static ArmorSet DiamondArmor()
+    public static ArmorSet CreateDiamondArmor()
     {
         var tier = new Item.ArmourTierDiamond();
-        return new ArmorSet(Create(new Item.Helmet(tier)), Create(new Item.Chestplate(tier)), Create(new Item.Leggings(tier)), Create(new Item.Boots(tier)));
+        return new ArmorSet(
+            CreateStack(new Item.Helmet(tier)),
+            CreateStack(new Item.Chestplate(tier)),
+            CreateStack(new Item.Leggings(tier)),
+            CreateStack(new Item.Boots(tier)));
     }
 
-    public static ArmorSet NetheriteArmor()
+    public static ArmorSet CreateNetheriteArmor()
     {
         var tier = new Item.ArmourTierNetherite();
-        return new ArmorSet(Create(new Item.Helmet(tier)), Create(new Item.Chestplate(tier)), Create(new Item.Leggings(tier)), Create(new Item.Boots(tier)));
+        return new ArmorSet(
+            CreateStack(new Item.Helmet(tier)),
+            CreateStack(new Item.Chestplate(tier)),
+            CreateStack(new Item.Leggings(tier)),
+            CreateStack(new Item.Boots(tier)));
     }
 }

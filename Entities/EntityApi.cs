@@ -4,7 +4,6 @@ namespace Toolbox.Entities;
 
 public static class EntityApi
 {
-
     public static Vector3 GetPosition(World.Entity entity)
     {
         return entity.Position();
@@ -20,7 +19,7 @@ public static class EntityApi
         return entity.H();
     }
 
-    public static void Close(World.Entity entity)
+    public static void CloseEntity(World.Entity entity)
     {
         entity.Close();
     }
@@ -55,13 +54,74 @@ public static class EntityApi
         return tx.RemoveEntity(entity);
     }
 
-    public static IEnumerable<World.Entity> GetAll(World.Tx tx)
+    public static IEnumerable<World.Entity> GetEntities(World.Tx tx)
     {
         return tx.Entities();
     }
 
-    public static IEnumerable<World.Entity> GetNearby(World.Tx tx, Vector3 center, double radius)
+    public static IEnumerable<World.Entity> GetNearbyEntities(World.Tx tx, Vector3 center, double radius)
     {
         return tx.EntitiesWithin(Cube.Box(center.X - radius, center.Y - radius, center.Z - radius, center.X + radius, center.Y + radius, center.Z + radius));
+    }
+
+    public static IEnumerable<World.Entity> GetEntitiesWithin(World.Tx tx, Cube.BBox box)
+    {
+        return tx.EntitiesWithin(box);
+    }
+
+    private static World.VisibilityLevel ToDragonflyVisibility(EntityVisibility visibility)
+    {
+        return visibility switch
+        {
+            EntityVisibility.Public => World.PublicVisibility(),
+            EntityVisibility.ForceInvisible => World.EnforceInvisible(),
+            EntityVisibility.ForceVisible => World.EnforceVisible(),
+            _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null),
+        };
+    }
+
+    public static void HideEntityFromViewer(Player viewer, World.Entity entity)
+    {
+        viewer.HideEntity(entity);
+    }
+
+    public static void ShowEntityToViewer(Player viewer, World.Entity entity)
+    {
+        viewer.ShowEntity(entity);
+    }
+
+    public static void ViewNameTag(Player viewer, World.Entity entity, string nameTag)
+    {
+        viewer.ViewNameTag(entity, nameTag);
+    }
+
+    public static void ViewPublicNameTag(Player viewer, World.Entity entity)
+    {
+        viewer.ViewPublicNameTag(entity);
+    }
+
+    public static void ViewScoreTag(Player viewer, World.Entity entity, string scoreTag)
+    {
+        viewer.ViewScoreTag(entity, scoreTag);
+    }
+
+    public static void ViewPublicScoreTag(Player viewer, World.Entity entity)
+    {
+        viewer.ViewPublicScoreTag(entity);
+    }
+
+    private static void ViewVisibility(Player viewer, World.Entity entity, World.VisibilityLevel level)
+    {
+        viewer.ViewVisibility(entity, level);
+    }
+
+    public static void ViewVisibility(Player viewer, World.Entity entity, EntityVisibility visibility)
+    {
+        ViewVisibility(viewer, entity, ToDragonflyVisibility(visibility));
+    }
+
+    public static void RemoveViewLayer(Player viewer, World.Entity entity)
+    {
+        viewer.RemoveViewLayer(entity);
     }
 }

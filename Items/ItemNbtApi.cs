@@ -14,54 +14,54 @@ public static class ItemNbtApi
         return stack.Value(key).Ok;
     }
 
-    public static (object? Value, bool Found) Get(Item.Stack stack, string key)
+    public static (object? Value, bool Found) GetTag(Item.Stack stack, string key)
     {
         var (value, ok) = stack.Value(key);
         return (value, ok);
     }
 
-    public static Item.Stack Set(Item.Stack stack, string key, object value)
+    public static Item.Stack SetTag(Item.Stack stack, string key, object value)
     {
         ArgumentNullException.ThrowIfNull(value);
         return stack.WithValue(key, value);
     }
 
-    public static Item.Stack Remove(Item.Stack stack, string key)
+    public static Item.Stack RemoveTag(Item.Stack stack, string key)
     {
         return stack.WithValue(key, null);
     }
 
     public static Item.Stack SetString(Item.Stack stack, string key, string value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetInt(Item.Stack stack, string key, int value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetLong(Item.Stack stack, string key, long value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetFloat(Item.Stack stack, string key, float value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetDouble(Item.Stack stack, string key, double value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetBool(Item.Stack stack, string key, bool value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetByteArray(Item.Stack stack, string key, byte[] value)
     {
-        return Set(stack, key, value);
+        return SetTag(stack, key, value);
     }
     public static Item.Stack SetCompound(Item.Stack stack, string key, IReadOnlyDictionary<string, object> value)
     {
-        return Set(stack, key, value.ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal));
+        return SetTag(stack, key, value.ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal));
     }
 
     public static string GetString(Item.Stack stack, string key, string defaultValue = "")
@@ -99,7 +99,7 @@ public static class ItemNbtApi
         return stack.Value(key) is { Ok: true, Value: byte[] value } ? value : [];
     }
 
-    public static Dictionary<string, object> Compound(params (string Key, object Value)[] values)
+    public static Dictionary<string, object> CreateCompoundTag(params (string Key, object Value)[] values)
     {
         var result = new Dictionary<string, object>(StringComparer.Ordinal);
         foreach (var (key, value) in values)

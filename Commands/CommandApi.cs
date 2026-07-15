@@ -5,7 +5,7 @@ namespace Toolbox.Commands;
 
 public static class CommandApi
 {
-    public static CommandBuilder Builder(string name, string description)
+    public static CommandBuilder CreateCommandBuilder(string name, string description)
     {
         return new CommandBuilder(name, description);
     }

@@ -1,10 +1,9 @@
 using Dragonfly;
 
-namespace Toolbox.Worlds;
+namespace Toolbox.Servers;
 
 public static class ServerApi
 {
-
     public static World GetOverworld(Server server)
     {
         return server.World();

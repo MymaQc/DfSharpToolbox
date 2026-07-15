@@ -4,23 +4,28 @@ namespace Toolbox.Forms;
 
 public static class FormFactory
 {
-    public static SimpleForm Simple(string title)
+    public static SimpleForm CreateSimpleForm(string title)
     {
         return new SimpleForm(title);
     }
 
-    public static ModalForm Modal(string title, string content = "")
+    public static ModalForm CreateModalForm(string title, string content = "")
     {
         return new ModalForm(title, content);
     }
 
-    public static CustomForm Custom(string title)
+    public static CustomForm CreateCustomForm(string title)
     {
         return new CustomForm(title);
     }
 
-    public static void Send(Player player, Form.Value form)
+    public static void SendForm(Player player, Form.Value form)
     {
         player.SendForm(form);
+    }
+
+    public static void CloseForm(Player player)
+    {
+        player.CloseForm();
     }
 }

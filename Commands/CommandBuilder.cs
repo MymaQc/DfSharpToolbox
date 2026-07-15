@@ -36,13 +36,13 @@ public sealed class CommandBuilder
         return AddOverload(new TCommand());
     }
 
-    public CommandBuilder Execute(Action<CommandContext> executor)
+    public CommandBuilder OnExecute(Action<CommandContext> executor)
     {
         ArgumentNullException.ThrowIfNull(executor);
         return AddOverload(new BuilderCommand(executor));
     }
 
-    public CommandBuilder ExecutePlayer(Action<CommandContext, Player> executor)
+    public CommandBuilder OnPlayerExecute(Action<CommandContext, Player> executor)
     {
         ArgumentNullException.ThrowIfNull(executor);
         return AddOverload(new BuilderPlayerCommand(executor));
@@ -54,7 +54,7 @@ public sealed class CommandBuilder
             : Cmd.New(_name, _description, [.. _aliases], [.. _overloads]);
     }
 
-    public void Register()
+    public void RegisterCommand()
     {
         CommandApi.RegisterCommand(Build());
     }

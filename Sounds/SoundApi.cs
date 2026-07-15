@@ -9,127 +9,127 @@ public static class SoundApi
         return sound.ToDragonfly();
     }
 
-    public static ToolboxSound From(World.Sound sound)
+    public static ToolboxSound FromDragonflySound(World.Sound sound)
     {
-        return ToolboxSound.From(sound);
+        return ToolboxSound.FromDragonflySound(sound);
     }
 
-    public static void Play(World.Tx tx, Vector3 position, ToolboxSound sound)
+    public static void PlaySound(World.Tx tx, Vector3 position, ToolboxSound sound)
     {
-        Play(tx, position, From(sound));
+        PlayDragonflySound(tx, position, From(sound));
     }
 
-    private static void Play(World.Tx tx, Vector3 position, World.Sound sound)
+    private static void PlayDragonflySound(World.Tx tx, Vector3 position, World.Sound sound)
     {
         ArgumentNullException.ThrowIfNull(tx);
         ArgumentNullException.ThrowIfNull(sound);
         tx.PlaySound(position, sound);
     }
 
-    public static void Play(Player player, ToolboxSound sound)
+    public static void PlaySound(Player player, ToolboxSound sound)
     {
-        Play(player, From(sound));
+        PlayDragonflySound(player, From(sound));
     }
 
-    private static void Play(Player player, World.Sound sound)
+    private static void PlayDragonflySound(Player player, World.Sound sound)
     {
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(sound);
         player.PlaySound(sound);
     }
 
-    public static ToolboxSound Attack(bool damage = true)
+    public static ToolboxSound CreateAttackSound(bool damage = true)
     {
-        return ToolboxSound.Attack(damage);
+        return ToolboxSound.CreateAttackSound(damage);
     }
 
-    public static ToolboxSound Fall(double distance)
+    public static ToolboxSound CreateFallSound(double distance)
     {
-        return ToolboxSound.Fall(distance);
+        return ToolboxSound.CreateFallSound(distance);
     }
 
-    public static ToolboxSound BlockPlace(World.Block block)
+    public static ToolboxSound CreateBlockPlaceSound(World.Block block)
     {
-        return ToolboxSound.BlockPlace(block);
+        return ToolboxSound.CreateBlockPlaceSound(block);
     }
 
-    public static ToolboxSound BlockBreaking(World.Block block)
+    public static ToolboxSound CreateBlockBreakingSound(World.Block block)
     {
-        return ToolboxSound.BlockBreaking(block);
+        return ToolboxSound.CreateBlockBreakingSound(block);
     }
 
-    public static ToolboxSound DoorOpen(World.Block block)
+    public static ToolboxSound CreateDoorOpenSound(World.Block block)
     {
-        return ToolboxSound.DoorOpen(block);
+        return ToolboxSound.CreateDoorOpenSound(block);
     }
 
-    public static ToolboxSound DoorClose(World.Block block)
+    public static ToolboxSound CreateDoorCloseSound(World.Block block)
     {
-        return ToolboxSound.DoorClose(block);
+        return ToolboxSound.CreateDoorCloseSound(block);
     }
 
-    public static ToolboxSound TrapdoorOpen(World.Block block)
+    public static ToolboxSound CreateTrapdoorOpenSound(World.Block block)
     {
-        return ToolboxSound.TrapdoorOpen(block);
+        return ToolboxSound.CreateTrapdoorOpenSound(block);
     }
 
-    public static ToolboxSound TrapdoorClose(World.Block block)
+    public static ToolboxSound CreateTrapdoorCloseSound(World.Block block)
     {
-        return ToolboxSound.TrapdoorClose(block);
+        return ToolboxSound.CreateTrapdoorCloseSound(block);
     }
 
-    public static ToolboxSound FenceGateOpen(World.Block block)
+    public static ToolboxSound CreateFenceGateOpenSound(World.Block block)
     {
-        return ToolboxSound.FenceGateOpen(block);
+        return ToolboxSound.CreateFenceGateOpenSound(block);
     }
 
-    public static ToolboxSound FenceGateClose(World.Block block)
+    public static ToolboxSound CreateFenceGateCloseSound(World.Block block)
     {
-        return ToolboxSound.FenceGateClose(block);
+        return ToolboxSound.CreateFenceGateCloseSound(block);
     }
 
-    public static ToolboxSound Note(Sound.Instrument instrument, int pitch)
+    public static ToolboxSound CreateNoteSound(Sound.Instrument instrument, int pitch)
     {
-        return ToolboxSound.Note(instrument, pitch);
+        return ToolboxSound.CreateNoteSound(instrument, pitch);
     }
 
-    public static ToolboxSound MusicDisc(Sound.DiscType discType)
+    public static ToolboxSound CreateMusicDiscSound(Sound.DiscType discType)
     {
-        return ToolboxSound.MusicDisc(discType);
+        return ToolboxSound.CreateMusicDiscSound(discType);
     }
 
-    public static ToolboxSound DecoratedPotInserted(double progress)
+    public static ToolboxSound CreateDecoratedPotInsertedSound(double progress)
     {
-        return ToolboxSound.DecoratedPotInserted(progress);
+        return ToolboxSound.CreateDecoratedPotInsertedSound(progress);
     }
 
-    public static ToolboxSound ItemUseOn(World.Block block)
+    public static ToolboxSound CreateItemUseOnSound(World.Block block)
     {
-        return ToolboxSound.ItemUseOn(block);
+        return ToolboxSound.CreateItemUseOnSound(block);
     }
 
-    public static ToolboxSound EquipItem(World.Item item)
+    public static ToolboxSound CreateEquipItemSound(World.Item item)
     {
-        return ToolboxSound.EquipItem(item);
+        return ToolboxSound.CreateEquipItemSound(item);
     }
 
-    public static ToolboxSound BucketFill(World.Liquid liquid)
+    public static ToolboxSound CreateBucketFillSound(World.Liquid liquid)
     {
-        return ToolboxSound.BucketFill(liquid);
+        return ToolboxSound.CreateBucketFillSound(liquid);
     }
 
-    public static ToolboxSound BucketEmpty(World.Liquid liquid)
+    public static ToolboxSound CreateBucketEmptySound(World.Liquid liquid)
     {
-        return ToolboxSound.BucketEmpty(liquid);
+        return ToolboxSound.CreateBucketEmptySound(liquid);
     }
 
-    public static ToolboxSound CrossbowLoad(int stage, bool quickCharge = false)
+    public static ToolboxSound CreateCrossbowLoadSound(int stage, bool quickCharge = false)
     {
-        return ToolboxSound.CrossbowLoad(stage, quickCharge);
+        return ToolboxSound.CreateCrossbowLoadSound(stage, quickCharge);
     }
 
-    public static ToolboxSound GoatHorn(Sound.Horn horn)
+    public static ToolboxSound CreateGoatHornSound(Sound.Horn horn)
     {
-        return ToolboxSound.GoatHorn(horn);
+        return ToolboxSound.CreateGoatHornSound(horn);
     }
 }

@@ -9,7 +9,7 @@ public static class BlockFactory
         return World.BlockByName(name, states);
     }
 
-    public static (World.Block? Block, bool Ok) FromName(string name, Dictionary<string, object?>? states = null)
+    public static (World.Block? Block, bool Ok) GetBlockByName(string name, Dictionary<string, object?>? states = null)
     {
         return Get(name, states);
     }
@@ -27,12 +27,12 @@ public static class BlockFactory
         return true;
     }
 
-    public static bool TryFromName(string name, out World.Block block, Dictionary<string, object?>? states = null)
+    public static bool TryGetBlockByName(string name, out World.Block block, Dictionary<string, object?>? states = null)
     {
         return TryGet(name, out block, states);
     }
 
-    public static World.Block Require(string name, Dictionary<string, object?>? states = null)
+    public static World.Block RequireBlockByName(string name, Dictionary<string, object?>? states = null)
     {
         var (block, ok) = Get(name, states);
         if (!ok || block is null)
@@ -43,7 +43,7 @@ public static class BlockFactory
         return block;
     }
 
-    public static Dictionary<string, object?> States(params (string Name, object? Value)[] states)
+    public static Dictionary<string, object?> CreateBlockStates(params (string Name, object? Value)[] states)
     {
         var values = new Dictionary<string, object?>(StringComparer.Ordinal);
         foreach (var (name, value) in states)

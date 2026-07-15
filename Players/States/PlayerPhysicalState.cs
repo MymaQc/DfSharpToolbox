@@ -1,4 +1,4 @@
-namespace Toolbox.Players;
+namespace Toolbox.Players.States;
 
 public readonly record struct PlayerPhysicalState(
     double FallDistance,

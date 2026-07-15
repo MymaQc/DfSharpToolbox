@@ -11,7 +11,7 @@ public sealed class CustomFormResponse
         _options = options;
     }
 
-    public bool Has(string name)
+    public bool HasValue(string name)
     {
         return _values.ContainsKey(name);
     }

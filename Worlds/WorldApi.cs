@@ -4,6 +4,10 @@ namespace Toolbox.Worlds;
 
 public static class WorldApi
 {
+    public static readonly World.Difficulty PEACEFUL = World.DifficultyPeaceful;
+    public static readonly World.Difficulty EASY = World.DifficultyEasy;
+    public static readonly World.Difficulty NORMAL = World.DifficultyNormal;
+    public static readonly World.Difficulty HARD = World.DifficultyHard;
 
     public static World CreateWorld(World.Config config)
     {
@@ -45,21 +49,6 @@ public static class WorldApi
         }.New();
     }
 
-    public static World.Dimension GetOverworldDimension()
-    {
-        return World.Overworld;
-    }
-
-    public static World.Dimension GetNetherDimension()
-    {
-        return World.Nether;
-    }
-
-    public static World.Dimension GetEndDimension()
-    {
-        return World.End;
-    }
-
     public static string GetName(World world)
     {
         return world.Name();
@@ -96,7 +85,7 @@ public static class WorldApi
         return GetPlayerSpawn(world, player.UUID());
     }
 
-    public static Cube.Pos GetPlayerSpawn(World world, Guid playerId)
+    private static Cube.Pos GetPlayerSpawn(World world, Guid playerId)
     {
         return world.PlayerSpawn(playerId);
     }
@@ -107,7 +96,7 @@ public static class WorldApi
         SetPlayerSpawn(world, player.UUID(), spawn);
     }
 
-    public static void SetPlayerSpawn(World world, Guid playerId, Cube.Pos spawn)
+    private static void SetPlayerSpawn(World world, Guid playerId, Cube.Pos spawn)
     {
         world.SetPlayerSpawn(playerId, spawn);
     }
@@ -167,26 +156,6 @@ public static class WorldApi
         world.SetDifficulty(difficulty);
     }
 
-    public static World.Difficulty GetPeacefulDifficulty()
-    {
-        return World.DifficultyPeaceful;
-    }
-
-    public static World.Difficulty GetEasyDifficulty()
-    {
-        return World.DifficultyEasy;
-    }
-
-    public static World.Difficulty GetNormalDifficulty()
-    {
-        return World.DifficultyNormal;
-    }
-
-    public static World.Difficulty GetHardDifficulty()
-    {
-        return World.DifficultyHard;
-    }
-
     public static (World.Difficulty Difficulty, bool Ok) GetDifficultyById(int id)
     {
         return World.DifficultyByID(id);
@@ -197,24 +166,14 @@ public static class WorldApi
         return World.DifficultyID(difficulty);
     }
 
-    public static void Save(World world)
+    public static void SaveWorld(World world)
     {
         world.Save();
     }
 
-    public static void Close(World world)
+    public static void CloseWorld(World world)
     {
         world.Close();
-    }
-
-    public static World.Task Run(World world, Action<World.Tx> callback)
-    {
-        return world.Do(callback);
-    }
-
-    public static World.Task RunLater(World world, TimeSpan delay, Action<World.Tx> callback)
-    {
-        return world.DoAfter(delay, callback);
     }
 
     public static World GetWorld(World.Tx tx)
@@ -247,32 +206,12 @@ public static class WorldApi
         tx.AddParticle(position, particle);
     }
 
-    public static void PlaySound(World.Tx tx, Vector3 position, World.Sound sound)
-    {
-        tx.PlaySound(position, sound);
-    }
-
     public static IEnumerable<Player> GetPlayers(World.Tx tx)
     {
         return tx.Players().OfType<Player>();
     }
 
-    public static IEnumerable<World.Entity> GetEntities(World.Tx tx)
-    {
-        return tx.Entities();
-    }
-
-    public static IEnumerable<World.Entity> GetEntitiesAround(World.Tx tx, Vector3 center, double radius)
-    {
-        return tx.EntitiesWithin(Cube.Box(center.X - radius, center.Y - radius, center.Z - radius, center.X + radius, center.Y + radius, center.Z + radius));
-    }
-
-    public static IEnumerable<World.Entity> GetEntitiesWithin(World.Tx tx, Cube.BBox box)
-    {
-        return tx.EntitiesWithin(box);
-    }
-
-    public static void Broadcast(World.Tx tx, params object?[] message)
+    public static void BroadcastMessage(World.Tx tx, params object?[] message)
     {
         foreach (var player in GetPlayers(tx))
         {

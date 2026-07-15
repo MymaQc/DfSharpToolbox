@@ -24,7 +24,17 @@ public static class PositionApi
         return Cube.PosFromVec3(position);
     }
 
-    public static Vector3 Add(Vector3 position, double x = 0, double y = 0, double z = 0)
+    public static Cube.Pos AddToBlockPosition(Cube.Pos position, int x = 0, int y = 0, int z = 0)
+    {
+        return position.Add(new Cube.Pos(x, y, z));
+    }
+
+    public static Cube.Pos GetSide(Cube.Pos position, Cube.Face face)
+    {
+        return position.Side(face);
+    }
+
+    public static Vector3 AddToVector(Vector3 position, double x = 0, double y = 0, double z = 0)
     {
         return new Vector3(position.X + x, position.Y + y, position.Z + z);
     }

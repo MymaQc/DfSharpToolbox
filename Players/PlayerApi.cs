@@ -1,6 +1,6 @@
 using Dragonfly;
-using Toolbox.Forms;
-using DPacket = Dragonfly.Packet.Packet;
+using Toolbox.Players.States;
+using Toolbox.Timing;
 
 namespace Toolbox.Players;
 
@@ -61,17 +61,10 @@ public static class PlayerApi
     {
         player.SendJukeboxPopup(message);
     }
-
-    public static void PlaySound(Player player, World.Sound sound)
+    
+    public static void SendToast(Player player, string title, string message)
     {
-        player.PlaySound(sound);
-    }
-
-    public static void SendPacket(Player player, DPacket packet)
-    {
-        ArgumentNullException.ThrowIfNull(player);
-        ArgumentNullException.ThrowIfNull(packet);
-        player.WritePacket(packet);
+        player.SendToast(title, message);
     }
 
     public static void Kick(Player player, params object?[] reason)
@@ -89,12 +82,12 @@ public static class PlayerApi
         player.Teleport(position);
     }
 
-    public static void Move(Player player, Vector3 delta, double yaw = 0, double pitch = 0)
+    public static void MoveBy(Player player, Vector3 delta, double yaw = 0, double pitch = 0)
     {
         player.Move(delta, yaw, pitch);
     }
 
-    public static void Displace(Player player, Vector3 delta)
+    public static void DisplaceBy(Player player, Vector3 delta)
     {
         player.Displace(delta);
     }
@@ -107,6 +100,11 @@ public static class PlayerApi
     public static void SetVelocity(Player player, Vector3 velocity)
     {
         player.SetVelocity(velocity);
+    }
+
+    public static void KnockBack(Player player, Vector3 source, double force, double height)
+    {
+        player.KnockBack(source, force, height);
     }
 
     public static PlayerSpeedSettings GetSpeedSettings(Player player)
@@ -169,6 +167,26 @@ public static class PlayerApi
     public static void Feed(Player player, int food = 20)
     {
         player.SetFood(food);
+    }
+
+    public static PlayerFoodState GetFoodState(Player player)
+    {
+        return new PlayerFoodState(player.Food());
+    }
+
+    public static void AddFood(Player player, int points)
+    {
+        player.AddFood(points);
+    }
+
+    public static void Saturate(Player player, int food, double saturation)
+    {
+        player.Saturate(food, saturation);
+    }
+
+    public static void Exhaust(Player player, double points)
+    {
+        player.Exhaust(points);
     }
 
     public static double GetHealth(Player player)
@@ -266,6 +284,51 @@ public static class PlayerApi
     public static void SetExperienceProgress(Player player, double progress)
     {
         player.SetExperienceProgress(progress);
+    }
+
+    public static PlayerExperienceState GetExperienceState(Player player)
+    {
+        return new PlayerExperienceState(
+            player.ExperienceLevel(),
+            player.ExperienceProgress(),
+            player.Experience(),
+            player.EnchantmentSeed(),
+            player.CanCollectExperience());
+    }
+
+    public static int GetExperience(Player player)
+    {
+        return player.Experience();
+    }
+
+    public static int AddExperience(Player player, int amount)
+    {
+        return player.AddExperience(amount);
+    }
+
+    public static void RemoveExperience(Player player, int amount)
+    {
+        player.RemoveExperience(amount);
+    }
+
+    public static long GetEnchantmentSeed(Player player)
+    {
+        return player.EnchantmentSeed();
+    }
+
+    public static void ResetEnchantmentSeed(Player player)
+    {
+        player.ResetEnchantmentSeed();
+    }
+
+    public static bool CanCollectExperience(Player player)
+    {
+        return player.CanCollectExperience();
+    }
+
+    public static bool CollectExperience(Player player, int amount)
+    {
+        return player.CollectExperience(amount);
     }
 
     public static double GetScale(Player player)
@@ -461,88 +524,268 @@ public static class PlayerApi
         player.SetGameMode(gameMode);
     }
 
-    public static void AddEffect(Player player, Effect.Value effect)
+    public static Skin GetSkin(Player player)
     {
-        player.AddEffect(effect);
+        return player.Skin();
     }
 
-    public static void RemoveEffect(Player player, Effect.Type effect)
+    public static void SetSkin(Player player, Skin skin)
     {
-        player.RemoveEffect(effect);
+        player.SetSkin(skin);
     }
 
-    public static (Effect.Value Effect, bool Ok) GetEffect(Player player, Effect.Type effect)
+    public static PlayerIdentitySnapshot GetIdentitySnapshot(Player player)
     {
-        return player.Effect(effect);
+        return new PlayerIdentitySnapshot(
+            player.Name(),
+            player.UUID(),
+            player.XUID(),
+            player.DeviceID(),
+            player.DeviceModel(),
+            player.SelfSignedID(),
+            player.Locale(),
+            player.Addr());
     }
 
-    public static bool HasEffect(Player player, Effect.Type effect)
+    public static string GetDeviceId(Player player)
     {
-        return player.Effect(effect).Ok;
+        return player.DeviceID();
     }
 
-    public static IReadOnlyList<Effect.Value> GetEffects(Player player)
+    public static string GetDeviceModel(Player player)
     {
-        return player.Effects();
+        return player.DeviceModel();
     }
 
-    public static Inventory.Value GetInventory(Player player)
+    public static string GetSelfSignedId(Player player)
     {
-        return player.Inventory();
+        return player.SelfSignedID();
     }
 
-    public static Inventory.Value GetEnderChestInventory(Player player)
+    public static Language.Tag GetLocale(Player player)
     {
-        return player.EnderChestInventory();
+        return player.Locale();
     }
 
-    public static Inventory.Armour GetArmorInventory(Player player)
+    public static Net.Addr? GetAddress(Player player)
     {
-        return player.Armour();
+        return player.Addr();
     }
 
-    public static int GiveItem(Player player, Item.Stack item)
+    public static string GetAddressText(Player player)
     {
-        return player.Inventory().AddItem(item);
+        return player.Addr()?.String() ?? string.Empty;
     }
 
-    public static void SetInventoryItem(Player player, int slot, Item.Stack item)
+    public static string GetAddressNetwork(Player player)
     {
-        player.Inventory().SetItem(slot, item);
+        return player.Addr()?.Network() ?? string.Empty;
     }
 
-    public static Item.Stack GetInventoryItem(Player player, int slot)
+    public static PlayerFireState GetFireState(Player player)
     {
-        return player.Inventory().Item(slot);
+        return new PlayerFireState(player.FireProof(), player.OnFireDuration());
     }
 
-    public static (Item.Stack MainHand, Item.Stack OffHand) GetHeldItems(Player player)
+    public static bool IsFireProof(Player player)
     {
-        return player.HeldItems();
+        return player.FireProof();
     }
 
-    public static void SetHeldItems(Player player, Item.Stack mainHand, Item.Stack offHand)
+    public static TimeSpan GetOnFireDuration(Player player)
     {
-        player.SetHeldItems(mainHand, offHand);
+        return player.OnFireDuration();
     }
 
-    public static void SetHeldSlot(Player player, int slot)
+    public static void SetOnFire(Player player, TimeSpan duration)
     {
-        player.SetHeldSlot(slot);
+        player.SetOnFire(duration);
     }
 
-    public static void SetArmor(Player player, Item.Stack helmet, Item.Stack chestplate, Item.Stack leggings, Item.Stack boots)
+    public static void SetOnFireTicks(Player player, long ticks)
     {
-        player.Armour().Set(helmet, chestplate, leggings, boots);
+        player.SetOnFire(Ticks(ticks));
     }
 
-    public static void SendForm(Player player, Form.Value form)
+    public static void Extinguish(Player player)
     {
-        FormFactory.Send(player, form);
+        player.Extinguish();
     }
 
-    public static void CloseForm(Player player)
+    public static PlayerAirState GetAirState(Player player)
     {
-        player.CloseForm();
+        return new PlayerAirState(player.AirSupply(), player.MaxAirSupply());
+    }
+
+    public static TimeSpan GetAirSupply(Player player)
+    {
+        return player.AirSupply();
+    }
+
+    public static void SetAirSupply(Player player, TimeSpan duration)
+    {
+        player.SetAirSupply(duration);
+    }
+
+    public static void SetAirSupplyTicks(Player player, long ticks)
+    {
+        SetAirSupply(player, Ticks(ticks));
+    }
+
+    public static TimeSpan GetMaxAirSupply(Player player)
+    {
+        return player.MaxAirSupply();
+    }
+
+    private static void SetMaxAirSupply(Player player, TimeSpan duration)
+    {
+        player.SetMaxAirSupply(duration);
+    }
+
+    public static void SetMaxAirSupply(Player player, long ticks)
+    {
+        SetMaxAirSupply(player, Ticks(ticks));
+    }
+
+    public static PlayerStatusState GetStatusState(Player player)
+    {
+        return new PlayerStatusState(IsUsingItem(player), GetSleepState(player), GetDeathPosition(player));
+    }
+
+    public static bool IsUsingItem(Player player)
+    {
+        return player.UsingItem();
+    }
+
+    public static PlayerSleepState GetSleepState(Player player)
+    {
+        var (position, sleeping) = player.Sleeping();
+        return new PlayerSleepState(position, sleeping);
+    }
+
+    public static PlayerDeathPosition GetDeathPosition(Player player)
+    {
+        var (position, dimension, found) = player.DeathPosition();
+        return new PlayerDeathPosition(position, dimension, found);
+    }
+
+    public static double GetFinalDamage(Player player, double damage, World.DamageSource source)
+    {
+        return player.FinalDamageFrom(damage, source);
+    }
+
+    public static void EnableInstantRespawn(Player player)
+    {
+        player.EnableInstantRespawn();
+    }
+
+    public static void DisableInstantRespawn(Player player)
+    {
+        player.DisableInstantRespawn();
+    }
+
+    public static string GetNameTag(Player player)
+    {
+        return player.NameTag();
+    }
+
+    public static string GetScoreTag(Player player)
+    {
+        return player.ScoreTag();
+    }
+
+    public static void AbortBreaking(Player player)
+    {
+        player.AbortBreaking();
+    }
+
+    public static void FinishBreaking(Player player)
+    {
+        player.FinishBreaking();
+    }
+
+    public static void Jump(Player player)
+    {
+        player.Jump();
+    }
+
+    public static void MoveItemsToInventory(Player player)
+    {
+        player.MoveItemsToInventory();
+    }
+
+    public static void PunchAir(Player player)
+    {
+        player.PunchAir();
+    }
+
+    public static void ReleaseItem(Player player)
+    {
+        player.ReleaseItem();
+    }
+
+    public static void RemoveAllDebugShapes(Player player)
+    {
+        player.RemoveAllDebugShapes();
+    }
+
+    public static void SwingArm(Player player)
+    {
+        player.SwingArm();
+    }
+
+    public static void UseItem(Player player)
+    {
+        player.UseItem();
+    }
+
+    public static void WakeUp(Player player)
+    {
+        player.Wake();
+    }
+
+    public static void BreakBlock(Player player, Cube.Pos position)
+    {
+        player.BreakBlock(position);
+    }
+
+    public static void ContinueBreaking(Player player, Cube.Face face)
+    {
+        player.ContinueBreaking(face);
+    }
+
+    public static void PickBlock(Player player, Cube.Pos position)
+    {
+        player.PickBlock(position);
+    }
+
+    public static void SleepAt(Player player, Cube.Pos position)
+    {
+        player.Sleep(position);
+    }
+
+    public static void StartBreaking(Player player, Cube.Pos position, Cube.Face face)
+    {
+        player.StartBreaking(position, face);
+    }
+
+    public static void UseItemOnBlock(Player player, Cube.Pos position, Cube.Face face, Vector3 clickPosition)
+    {
+        player.UseItemOnBlock(position, face, clickPosition);
+    }
+
+    public static bool UseItemOnEntity(Player player, World.Entity entity)
+    {
+        return player.UseItemOnEntity(entity);
+    }
+
+    public static bool AttackEntity(Player player, World.Entity entity)
+    {
+        return player.AttackEntity(entity);
+    }
+
+    private static TimeSpan Ticks(long ticks)
+    {
+        return TimeApi.ConvertGameTicksToDuration(ticks);
     }
 }

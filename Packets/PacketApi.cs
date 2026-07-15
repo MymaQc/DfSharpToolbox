@@ -13,36 +13,36 @@ public static class PacketApi
 {
     private const BindingFlags PublicInstance = BindingFlags.Instance | BindingFlags.Public;
 
-    private static uint GetId(DPacket packet)
+    private static uint GetDragonflyPacketId(DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(packet);
         return packet.ID();
     }
 
-    public static string GetName(DPacket packet)
+    public static string GetPacketName(DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(packet);
         return packet.GetType().Name;
     }
 
-    public static Type GetType(DPacket packet)
+    public static Type GetPacketType(DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(packet);
         return packet.GetType();
     }
 
-    public static bool IsKnown(DPacket packet)
+    public static bool IsKnownPacket(DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(packet);
         return packet is not DPacketUnknown;
     }
 
-    public static bool HasId(DPacket packet, uint id)
+    public static bool HasPacketId(DPacket packet, uint id)
     {
-        return GetId(packet) == id;
+        return GetDragonflyPacketId(packet) == id;
     }
 
-    public static string GetXuid(DPacketContext context)
+    public static string GetContextXuid(DPacketContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         return context.XUID();
@@ -54,56 +54,56 @@ public static class PacketApi
         return context.Cancelled();
     }
 
-    public static void Cancel(DPacketContext context)
+    public static void CancelContext(DPacketContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         context.Cancel();
     }
 
-    public static void Send(Player player, DPacket packet)
+    public static void SendPacket(Player player, DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(packet);
         player.WritePacket(packet);
     }
 
-    public static void SendTo(Player player, DPacket packet)
+    public static void SendPacketToPlayer(Player player, DPacket packet)
     {
-        Send(player, packet);
+        SendPacket(player, packet);
     }
 
-    public static void SendTo(IEnumerable<Player> players, DPacket packet)
+    public static void SendPacketToPlayers(IEnumerable<Player> players, DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(players);
         ArgumentNullException.ThrowIfNull(packet);
 
         foreach (var player in players)
         {
-            Send(player, packet);
+            SendPacket(player, packet);
         }
     }
 
-    public static void SendTo(World.Tx tx, DPacket packet)
+    public static void SendPacketToWorldPlayers(World.Tx tx, DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(tx);
-        SendTo(tx.Players().OfType<Player>(), packet);
+        SendPacketToPlayers(tx.Players().OfType<Player>(), packet);
     }
 
-    public static void Broadcast(IEnumerable<Player> players, DPacket packet)
+    public static void BroadcastPacket(IEnumerable<Player> players, DPacket packet)
     {
-        SendTo(players, packet);
+        SendPacketToPlayers(players, packet);
     }
 
-    public static void Broadcast(World.Tx tx, DPacket packet)
+    public static void BroadcastPacket(World.Tx tx, DPacket packet)
     {
-        SendTo(tx, packet);
+        SendPacketToWorldPlayers(tx, packet);
     }
 
-    public static bool TrySend(Player player, DPacket packet, out Exception? exception)
+    public static bool TrySendPacket(Player player, DPacket packet, out Exception? exception)
     {
         try
         {
-            Send(player, packet);
+            SendPacket(player, packet);
             exception = null;
             return true;
         }
@@ -114,32 +114,27 @@ public static class PacketApi
         }
     }
 
-    public static bool Is<TPacket>(DPacket packet) where TPacket : class, DPacket
+    public static bool IsPacket<TPacket>(DPacket packet) where TPacket : class, DPacket
     {
         return packet is TPacket;
     }
 
-    public static TPacket? As<TPacket>(DPacket packet) where TPacket : class, DPacket
+    public static TPacket? AsPacket<TPacket>(DPacket packet) where TPacket : class, DPacket
     {
         return packet as TPacket;
     }
 
-    public static TPacket Get<TPacket>(DPacket packet) where TPacket : class, DPacket
+    public static TPacket RequirePacket<TPacket>(DPacket packet) where TPacket : class, DPacket
     {
         if (packet is TPacket typed)
         {
             return typed;
         }
 
-        throw new InvalidOperationException($"Packet {GetName(packet)} is not {typeof(TPacket).Name}.");
+        throw new InvalidOperationException($"Packet {GetPacketName(packet)} is not {typeof(TPacket).Name}.");
     }
 
-    public static TPacket Require<TPacket>(DPacket packet) where TPacket : class, DPacket
-    {
-        return Get<TPacket>(packet);
-    }
-
-    public static bool TryGet<TPacket>(DPacket packet, out TPacket typed) where TPacket : class, DPacket
+    public static bool TryGetPacket<TPacket>(DPacket packet, out TPacket typed) where TPacket : class, DPacket
     {
         if (packet is TPacket value)
         {
@@ -151,22 +146,17 @@ public static class PacketApi
         return false;
     }
 
-    public static bool TryAs<TPacket>(DPacket packet, out TPacket typed) where TPacket : class, DPacket
-    {
-        return TryGet(packet, out typed);
-    }
-
-    public static void Edit<TPacket>(DPacket packet, Action<TPacket> editor) where TPacket : class, DPacket
+    public static void EditPacket<TPacket>(DPacket packet, Action<TPacket> editor) where TPacket : class, DPacket
     {
         ArgumentNullException.ThrowIfNull(editor);
-        editor(Get<TPacket>(packet));
+        editor(RequirePacket<TPacket>(packet));
     }
 
-    public static bool TryEdit<TPacket>(DPacket packet, Action<TPacket> editor, out Exception? exception) where TPacket : class, DPacket
+    public static bool TryEditPacket<TPacket>(DPacket packet, Action<TPacket> editor, out Exception? exception) where TPacket : class, DPacket
     {
         try
         {
-            Edit(packet, editor);
+            EditPacket(packet, editor);
             exception = null;
             return true;
         }
@@ -178,7 +168,7 @@ public static class PacketApi
     }
 
     [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Packet inspection is a best-effort Toolbox helper for generated Dragonfly packet proxies.")]
-    public static IReadOnlyList<PacketFieldSnapshot> Inspect(DPacket packet)
+    public static IReadOnlyList<PacketFieldSnapshot> InspectPacketFields(DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(packet);
         var fields = new List<PacketFieldSnapshot>();
@@ -195,14 +185,14 @@ public static class PacketApi
         return fields;
     }
 
-    public static IReadOnlyList<PacketFieldSnapshot> GetFields(DPacket packet)
+    public static IReadOnlyList<PacketFieldSnapshot> GetPacketFields(DPacket packet)
     {
-        return Inspect(packet);
+        return InspectPacketFields(packet);
     }
 
-    public static object? GetField(DPacket packet, string name)
+    public static object? GetPacketField(DPacket packet, string name)
     {
-        if (!TryGetField(packet, name, out var value, out var exception))
+        if (!TryGetPacketField(packet, name, out var value, out var exception))
         {
             throw exception ?? new InvalidOperationException($"Unable to read {name}.");
         }
@@ -210,7 +200,7 @@ public static class PacketApi
         return value;
     }
 
-    public static bool TryGetField(DPacket packet, string name, out object? value, out Exception? exception)
+    public static bool TryGetPacketField(DPacket packet, string name, out object? value, out Exception? exception)
     {
         try
         {
@@ -227,15 +217,15 @@ public static class PacketApi
         }
     }
 
-    public static void SetField(DPacket packet, string name, object? value)
+    public static void SetPacketField(DPacket packet, string name, object? value)
     {
-        if (!TrySetField(packet, name, value, out var exception))
+        if (!TrySetPacketField(packet, name, value, out var exception))
         {
             throw exception ?? new InvalidOperationException($"Unable to set {name}.");
         }
     }
 
-    public static bool TrySetField(DPacket packet, string name, object? value, out Exception? exception)
+    public static bool TrySetPacketField(DPacket packet, string name, object? value, out Exception? exception)
     {
         try
         {
@@ -263,18 +253,16 @@ public static class PacketApi
         return value.Json();
     }
 
-    private static bool TryGetJson(DPacketValue value, out string json, out Exception? exception)
+    private static bool TryGetJson(DPacketValue value, out string json)
     {
         try
         {
             json = GetJson(value);
-            exception = null;
             return true;
         }
-        catch (Exception error)
+        catch (Exception)
         {
             json = string.Empty;
-            exception = error;
             return false;
         }
     }
@@ -297,7 +285,7 @@ public static class PacketApi
         try
         {
             var value = property.GetValue(packet);
-            var json = value is DPacketValue packetValue && TryGetJson(packetValue, out var valueJson, out _) ? valueJson : null;
+            var json = value is DPacketValue packetValue && TryGetJson(packetValue, out var valueJson) ? valueJson : null;
             return new PacketFieldSnapshot(
                 property.Name,
                 GetFriendlyTypeName(property.PropertyType),
@@ -369,7 +357,7 @@ public static class PacketApi
             null => "null",
             string text => text,
             byte[] bytes => $"byte[{bytes.Length}]",
-            DPacketValue packetValue => TryGetJson(packetValue, out var json, out _) ? json : "<complex>",
+            DPacketValue packetValue => TryGetJson(packetValue, out var json) ? json : "<complex>",
             Array array => $"{value.GetType().GetElementType()?.Name ?? "object"}[{array.Length}]",
             _ => value.ToString() ?? string.Empty,
         };

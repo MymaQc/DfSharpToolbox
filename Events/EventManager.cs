@@ -18,13 +18,13 @@ public sealed class EventManager
         handlers.Add(handler);
     }
 
-    public void Register(Listener listener)
+    public void RegisterListener(Listener listener)
     {
         ArgumentNullException.ThrowIfNull(listener);
-        listener.Register(this);
+        listener.RegisterHandlers(this);
     }
 
-    public void Call<TEvent>(TEvent ev) where TEvent : Event
+    public void DispatchEvent<TEvent>(TEvent ev) where TEvent : Event
     {
         ArgumentNullException.ThrowIfNull(ev);
         if (!_handlers.TryGetValue(ev.GetType(), out var exactHandlers))
@@ -38,7 +38,7 @@ public sealed class EventManager
         }
     }
 
-    public void Clear()
+    public void ClearListeners()
     {
         _handlers.Clear();
     }
