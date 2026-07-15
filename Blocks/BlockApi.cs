@@ -14,6 +14,16 @@ public static class BlockApi
         };
     }
 
+    public static (World.Block? Block, bool Ok) FromName(string name, Dictionary<string, object?>? states = null)
+    {
+        return BlockFactory.FromName(name, states);
+    }
+
+    public static World.Block Require(string name, Dictionary<string, object?>? states = null)
+    {
+        return BlockFactory.Require(name, states);
+    }
+
     public static Cube.Range GetRange(World.Tx tx)
     {
         return tx.Range();

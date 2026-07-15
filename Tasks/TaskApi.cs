@@ -38,7 +38,7 @@ public static class TaskApi
         return RunTaskTimer(world, Ticks(delayTicks), Ticks(periodTicks), callback);
     }
 
-    public static TimeSpan Ticks(long ticks)
+    private static TimeSpan Ticks(long ticks)
     {
         return TimeSpan.FromTicks(checked(TickDuration.Ticks * System.Math.Max(0, ticks)));
     }

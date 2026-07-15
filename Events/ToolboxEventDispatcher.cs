@@ -11,6 +11,8 @@ using Toolbox.Events.Player.Lifecycle;
 using Toolbox.Events.Player.Movement;
 using Toolbox.Events.Player.Network;
 using Toolbox.Events.Player.State;
+using Toolbox.Events.Packets;
+using Toolbox.Events.Server;
 using Toolbox.Events.World;
 using Toolbox.Events.World.Blocks;
 using Toolbox.Events.World.Entities;
@@ -19,6 +21,8 @@ using Toolbox.Events.World.Lifecycle;
 using Toolbox.Events.World.Liquid;
 using Toolbox.Events.World.Redstone;
 using Toolbox.Events.World.Sound;
+using DPacketContext = Dragonfly.Packet.Context;
+using DPacket = Dragonfly.Packet.Packet;
 using DPlayer = Dragonfly.Player;
 using DWorld = Dragonfly.World;
 
@@ -33,6 +37,12 @@ public sealed class ToolboxEventDispatcher(EventManager events)
     {
         Events.Call(ev);
         return ev;
+    }
+
+    public (string Message, bool Allowed) Allow(Net.Addr address, Login.IdentityData identity, Login.ClientData client)
+    {
+        var ev = Call(new ConnectionPreLoginEvent(address, identity, client));
+        return ev.IsCancelled() ? (ev.KickMessage, false) : (string.Empty, true);
     }
 
     public void OnJoin(DPlayer.Context ctx)
@@ -480,5 +490,23 @@ public sealed class ToolboxEventDispatcher(EventManager events)
     public void HandleClose(DWorld.Tx tx)
     {
         Call(new WorldCloseEvent(tx.World()));
+    }
+
+    public void HandleClientPacket(DPacketContext ctx, DPacket packet)
+    {
+        var ev = Call(new ClientPacketEvent(ctx, packet));
+        if (ev.IsCancelled())
+        {
+            ctx.Cancel();
+        }
+    }
+
+    public void HandleServerPacket(DPacketContext ctx, DPacket packet)
+    {
+        var ev = Call(new ServerPacketEvent(ctx, packet));
+        if (ev.IsCancelled())
+        {
+            ctx.Cancel();
+        }
     }
 }

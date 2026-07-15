@@ -1,5 +1,7 @@
 using Dragonfly;
 using Toolbox.Events;
+using DPacketContext = Dragonfly.Packet.Context;
+using DPacket = Dragonfly.Packet.Packet;
 
 namespace Toolbox;
 
@@ -39,6 +41,11 @@ public abstract class ToolboxPlugin : Plugin
 
         _events.Clear();
         _disabled = true;
+    }
+
+    public override (string Message, bool Allowed) Allow(Net.Addr addr, Login.IdentityData d, Login.ClientData c)
+    {
+        return _eventDispatcher.Allow(addr, d, c);
     }
 
     public override void OnJoin(Player.Context ctx)
@@ -294,5 +301,15 @@ public abstract class ToolboxPlugin : Plugin
     public override void HandleClose(World.Tx tx)
     {
         _eventDispatcher.HandleClose(tx);
+    }
+
+    public override void HandleClientPacket(DPacketContext ctx, DPacket packet)
+    {
+        _eventDispatcher.HandleClientPacket(ctx, packet);
+    }
+
+    public override void HandleServerPacket(DPacketContext ctx, DPacket packet)
+    {
+        _eventDispatcher.HandleServerPacket(ctx, packet);
     }
 }

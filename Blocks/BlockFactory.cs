@@ -9,6 +9,29 @@ public static class BlockFactory
         return World.BlockByName(name, states);
     }
 
+    public static (World.Block? Block, bool Ok) FromName(string name, Dictionary<string, object?>? states = null)
+    {
+        return Get(name, states);
+    }
+
+    private static bool TryGet(string name, out World.Block block, Dictionary<string, object?>? states = null)
+    {
+        var (value, ok) = Get(name, states);
+        if (!ok || value is null)
+        {
+            block = null!;
+            return false;
+        }
+
+        block = value;
+        return true;
+    }
+
+    public static bool TryFromName(string name, out World.Block block, Dictionary<string, object?>? states = null)
+    {
+        return TryGet(name, out block, states);
+    }
+
     public static World.Block Require(string name, Dictionary<string, object?>? states = null)
     {
         var (block, ok) = Get(name, states);

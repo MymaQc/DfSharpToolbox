@@ -65,6 +65,21 @@ public static class WorldApi
         return world.Name();
     }
 
+    public static Cube.Range GetRange(World world)
+    {
+        return world.Range();
+    }
+
+    public static World.Dimension GetDimension(World world)
+    {
+        return world.Dimension();
+    }
+
+    public static int GetHighestLightBlocker(World world, int x, int z)
+    {
+        return world.HighestLightBlocker(x, z);
+    }
+
     public static Cube.Pos GetSpawn(World world)
     {
         return world.Spawn();
@@ -73,6 +88,113 @@ public static class WorldApi
     public static void SetSpawn(World world, Cube.Pos spawn)
     {
         world.SetSpawn(spawn);
+    }
+
+    public static Cube.Pos GetPlayerSpawn(World world, Player player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        return GetPlayerSpawn(world, player.UUID());
+    }
+
+    public static Cube.Pos GetPlayerSpawn(World world, Guid playerId)
+    {
+        return world.PlayerSpawn(playerId);
+    }
+
+    public static void SetPlayerSpawn(World world, Player player, Cube.Pos spawn)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        SetPlayerSpawn(world, player.UUID(), spawn);
+    }
+
+    public static void SetPlayerSpawn(World world, Guid playerId, Cube.Pos spawn)
+    {
+        world.SetPlayerSpawn(playerId, spawn);
+    }
+
+    public static int GetTime(World world)
+    {
+        return world.Time();
+    }
+
+    public static void SetTime(World world, int time)
+    {
+        world.SetTime(time);
+    }
+
+    public static bool IsTimeCycleEnabled(World world)
+    {
+        return world.TimeCycle();
+    }
+
+    public static void StartTimeCycle(World world)
+    {
+        world.StartTime();
+    }
+
+    public static void StopTimeCycle(World world)
+    {
+        world.StopTime();
+    }
+
+    public static void SetRequiredSleepDuration(World world, TimeSpan duration)
+    {
+        world.SetRequiredSleepDuration(duration);
+    }
+
+    public static World.GameMode GetDefaultGameMode(World world)
+    {
+        return world.DefaultGameMode();
+    }
+
+    public static void SetDefaultGameMode(World world, World.GameMode gameMode)
+    {
+        world.SetDefaultGameMode(gameMode);
+    }
+
+    public static void SetTickRange(World world, int tickRange)
+    {
+        world.SetTickRange(tickRange);
+    }
+
+    public static World.Difficulty GetDifficulty(World world)
+    {
+        return world.Difficulty();
+    }
+
+    public static void SetDifficulty(World world, World.Difficulty difficulty)
+    {
+        world.SetDifficulty(difficulty);
+    }
+
+    public static World.Difficulty GetPeacefulDifficulty()
+    {
+        return World.DifficultyPeaceful;
+    }
+
+    public static World.Difficulty GetEasyDifficulty()
+    {
+        return World.DifficultyEasy;
+    }
+
+    public static World.Difficulty GetNormalDifficulty()
+    {
+        return World.DifficultyNormal;
+    }
+
+    public static World.Difficulty GetHardDifficulty()
+    {
+        return World.DifficultyHard;
+    }
+
+    public static (World.Difficulty Difficulty, bool Ok) GetDifficultyById(int id)
+    {
+        return World.DifficultyByID(id);
+    }
+
+    public static (int Id, bool Ok) GetDifficultyId(World.Difficulty difficulty)
+    {
+        return World.DifficultyID(difficulty);
     }
 
     public static void Save(World world)
@@ -123,6 +245,11 @@ public static class WorldApi
     public static void AddParticle(World.Tx tx, Vector3 position, World.Particle particle)
     {
         tx.AddParticle(position, particle);
+    }
+
+    public static void PlaySound(World.Tx tx, Vector3 position, World.Sound sound)
+    {
+        tx.PlaySound(position, sound);
     }
 
     public static IEnumerable<Player> GetPlayers(World.Tx tx)
