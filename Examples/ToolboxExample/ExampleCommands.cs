@@ -217,12 +217,12 @@ public sealed class ToolboxKitCommand : PlayerToolboxCommand
     public int Count;
 
     [Cmd.Tag("name")]
-    public Cmd.Optional<string> Name;
+    public Cmd.Optional<Cmd.Varargs> Name;
 
     protected override void Execute(CommandContext ctx, Player player)
     {
         var count = System.Math.Clamp(Count, 1, 64);
-        var label = Name.LoadOr("Toolbox kit");
+        var label = Name.LoadOr(new Cmd.Varargs("Toolbox kit")).ToString();
         var item = ItemFactory.CreateBuilder(new Item.GoldenApple(), count)
             .SetCustomName(label)
             .SetTag("toolbox.command", "tbxkit")
