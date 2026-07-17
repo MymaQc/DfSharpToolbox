@@ -7,12 +7,13 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <DragonflyFrameworkRoot Condition="'$(DragonflyFrameworkRoot)' == ''">$(MSBuildThisFileDirectory)../../Lib/plugins</DragonflyFrameworkRoot>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Remove="Examples\**\*.cs"/>
-        <ProjectReference Include="../../Lib/plugins/csharp/Dragonfly/Dragonfly.csproj"/>
-        <ProjectReference Include="../../Lib/plugins/csharp/Dragonfly.Generator/Dragonfly.Generator.csproj"
+        <ProjectReference Include="$(DragonflyFrameworkRoot)/csharp/Dragonfly/Dragonfly.csproj"/>
+        <ProjectReference Include="$(DragonflyFrameworkRoot)/csharp/Dragonfly.Generator/Dragonfly.Generator.csproj"
                           OutputItemType="Analyzer"
                           ReferenceOutputAssembly="false"/>
     </ItemGroup>
