@@ -171,18 +171,7 @@ public static class PacketApi
     public static IReadOnlyList<PacketFieldSnapshot> InspectPacketFields(DPacket packet)
     {
         ArgumentNullException.ThrowIfNull(packet);
-        var fields = new List<PacketFieldSnapshot>();
-        foreach (var property in packet.GetType().GetProperties(PublicInstance))
-        {
-            if (property.GetIndexParameters().Length != 0)
-            {
-                continue;
-            }
-
-            fields.Add(ReadField(packet, property));
-        }
-
-        return fields;
+        return (from property in packet.GetType().GetProperties(PublicInstance) where property.GetIndexParameters().Length == 0 select ReadField(packet, property)).ToList();
     }
 
     public static IReadOnlyList<PacketFieldSnapshot> GetPacketFields(DPacket packet)
