@@ -2,18 +2,12 @@ using Dragonfly;
 
 namespace Toolbox.Inventories.Menus;
 
-public sealed class InventoryMenuSlot
+public sealed class InventoryMenuSlot(int index, Item.Stack item, object? value = null)
 {
-    public InventoryMenuSlot(int index, Item.Stack item, object? value = null)
-    {
-        Index = index;
-        Item = item;
-        Value = value;
-    }
 
-    public int Index { get; }
-    public Item.Stack Item { get; }
-    public object? Value { get; }
+    public int Index { get; } = index;
+    public Item.Stack Item { get; } = item;
+    public object? Value { get; } = value;
 
     public InventoryMenuSlot OnClick(Action<InventoryMenuClickContext> onClick)
     {
