@@ -45,7 +45,10 @@ public sealed class InventoryMenu
         object? value = null)
     {
         var slot = new InventoryMenuSlot(index, item, value);
-        if (onClick is not null) slot.OnClick(onClick);
+        if (onClick is not null)
+        {
+            slot.OnClick(onClick);
+        }
         return SetSlot(slot);
     }
 
@@ -56,7 +59,10 @@ public sealed class InventoryMenu
     {
         for (var index = 0; index < _slots.Length; index++)
         {
-            if (_slots[index] is null) return SetItem(index, item, onClick, value);
+            if (_slots[index] is null)
+            {
+                return SetItem(index, item, onClick, value);
+            }
         }
         throw new InvalidOperationException("The inventory menu has no empty slot left.");
     }
@@ -65,8 +71,13 @@ public sealed class InventoryMenu
     {
         ArgumentNullException.ThrowIfNull(items);
         if (startIndex < 0 || startIndex > _slots.Length - items.Length)
+        {
             throw new ArgumentOutOfRangeException(nameof(startIndex));
-        for (var index = 0; index < items.Length; index++) SetItem(startIndex + index, items[index]);
+        }
+        for (var index = 0; index < items.Length; index++)
+        {
+            SetItem(startIndex + index, items[index]);
+        }
         return this;
     }
 
@@ -112,14 +123,19 @@ public sealed class InventoryMenu
     internal InventoryMenuSnapshot Snapshot()
     {
         var slots = new InventoryMenuSlot?[_slots.Length];
-        for (var index = 0; index < _slots.Length; index++) slots[index] = _slots[index]?.Snapshot();
+        for (var index = 0; index < _slots.Length; index++)
+        {
+            slots[index] = _slots[index]?.Snapshot();
+        }
         return new InventoryMenuSnapshot(this, Title, Type, slots, _onClick, _onClose);
     }
 
     private void ValidateIndex(int index)
     {
         if ((uint)index >= (uint)_slots.Length)
+        {
             throw new ArgumentOutOfRangeException(nameof(index), index, $"Slot index must be between 0 and {_slots.Length - 1}.");
+        }
     }
 }
 
@@ -141,7 +157,10 @@ internal sealed class InventoryMenuSnapshot(
 
     public void Submit(Player player, int slot, Item.Stack item, World.Tx transaction)
     {
-        if ((uint)slot >= (uint)slots.Length) return;
+        if ((uint)slot >= (uint)slots.Length)
+        {
+            return;
+        }
         var selected = slots[slot] ?? new InventoryMenuSlot(slot, item);
         var context = new InventoryMenuClickContext(player, transaction, menu, selected, item);
         Run(selected.ClickHandler, context);
@@ -153,7 +172,10 @@ internal sealed class InventoryMenuSnapshot(
 
     private static void Run<T>(Action<T>? callback, T context)
     {
-        if (callback is null) return;
+        if (callback is null)
+        {
+            return;
+        }
         try { callback(context); }
         catch (Exception exception) { FormCallbackRunner.Report(exception); }
     }
