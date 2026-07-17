@@ -12,9 +12,13 @@ internal sealed class ExampleState
 
     public bool PacketLogEnabled { get; private set; }
 
+    public bool EventDiagnosticsEnabled { get; private set; }
+
     public string LastConnection { get; private set; } = "aucune connexion";
 
     public string LastPacket { get; private set; } = "aucun packet";
+
+    public string LastEvent { get; private set; } = "aucun event";
 
     public bool HasRepeatingTask()
     {
@@ -36,9 +40,19 @@ internal sealed class ExampleState
         PacketLogEnabled = enabled;
     }
 
+    public void SetEventDiagnosticsEnabled(bool enabled)
+    {
+        EventDiagnosticsEnabled = enabled;
+    }
+
     public void RecordPacket(string value)
     {
         LastPacket = value;
+    }
+
+    public void RecordEvent(string value)
+    {
+        LastEvent = value;
     }
 
     public void SetRepeatingTask(RepeatingToolboxTask task)

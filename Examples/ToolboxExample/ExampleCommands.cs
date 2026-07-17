@@ -1,4 +1,5 @@
 using Dragonfly;
+using Toolbox;
 using Toolbox.Blocks;
 using Toolbox.Commands;
 using Toolbox.Effects;
@@ -10,17 +11,19 @@ using Toolbox.Math;
 using Toolbox.Players;
 using Toolbox.Players.Controls;
 using Toolbox.Presentation;
+using Toolbox.Servers;
 using Toolbox.Sounds;
 using Toolbox.Tasks;
 using Toolbox.Timing;
 using Toolbox.Worlds;
 using Toolbox.Worlds.States;
+// ReSharper disable UnassignedField.Global
 
 namespace ToolboxExample;
 
 internal static class ExampleCommands
 {
-    public static void Register(ExampleState state)
+    public static void Register(ToolboxPlugin plugin, ExampleState state)
     {
         ToolboxKitCommand.State = state;
         ToolboxEffectCommand.State = state;
@@ -29,10 +32,18 @@ internal static class ExampleCommands
         CommandApi.RegisterPlayerCommand("tbxprofile", "Teste PlayerApi et les snapshots joueur.", ShowProfile);
         CommandApi.RegisterPlayerCommand("tbxitems", "Teste ItemFactory, ItemNbtApi, InventoryApi et ItemCooldownApi.", (_, player) => GiveItems(player));
         CommandApi.RegisterPlayerCommand("tbxforms", "Ouvre les forms Toolbox.", (_, player) => ExampleForms.OpenMain(player, state));
+        CommandApi.RegisterPlayerCommand("tbxinv", "Ouvre un faux inventaire interactif.", (_, player) => ExampleInventoryMenus.Open(player));
         CommandApi.RegisterPlayerCommand("tbxui", "Teste TitleApi, ToastApi, ScoreboardApi et PlayerControlApi.", (_, player) => ShowUi(player));
         CommandApi.RegisterPlayerCommand("tbxworld", "Teste WorldApi, BlockApi, DimensionApi et EntityApi.", World);
         CommandApi.RegisterPlayerCommand("tbxtask", "Teste TaskApi.", (ctx, player) => Tasks(ctx, player, state));
         CommandApi.RegisterPlayerCommand("tbxpacketlog", "Active ou desactive le log des packets.", (_, player) => TogglePacketLog(player, state));
+        CommandApi.RegisterPlayerCommand("tbxevents", "Active ou desactive les logs des events Toolbox.", (_, player) => ToggleEventDiagnostics(player, state));
+        CommandApi.RegisterPlayerCommand("tbxserver", "Teste ServerApi.", (ctx, player) => Server(ctx, player, plugin));
+        CommandApi.RegisterPlayerCommand("tbxcombat", "Teste les API combat, heal, velocity et quelques events.", (_, player) => Combat(player));
+        CommandApi.RegisterPlayerCommand("tbxinteract", "Prepare des items pour tester les events d'interaction.", (_, player) => Interact(player));
+        CommandApi.RegisterPlayerCommand("tbxblocks", "Teste les helpers blocks, lumiere, biome, meteo et liquides.", Blocks);
+        CommandApi.RegisterPlayerCommand("tbxentities", "Teste EntityApi et les couches de visibilite.", Entities);
+        CommandApi.RegisterPlayerCommand("tbxworldstate", "Teste spawn, temps, difficulte et dimensions.", WorldState);
 
         CommandApi.CreateCommandBuilder("tbxbuilder", "Exemple de CommandBuilder.")
             .AddAlias("tbxb")
@@ -50,10 +61,19 @@ internal static class ExampleCommands
         ctx.SendMessage("/tbxprofile - infos joueur");
         ctx.SendMessage("/tbxitems - items, NBT, inventaire, cooldown");
         ctx.SendMessage("/tbxforms - simple/modal/custom forms");
+        ctx.SendMessage("/tbxinv - faux conteneurs interactifs avec de vrais items");
         ctx.SendMessage("/tbxui - title, toast, scoreboard, HUD/input");
         ctx.SendMessage("/tbxworld - monde, blocks, entites, dimensions");
         ctx.SendMessage("/tbxtask - task immediate/later/repeating");
         ctx.SendMessage("/tbxpacketlog - inspecte les packets via events");
+        ctx.SendMessage("/tbxconfig <show|write|reload|defaults|remove|reset> [value] - config JSON");
+        ctx.SendMessage("/tbxevents - inspecte les events rares en console/tip");
+        ctx.SendMessage("/tbxserver - infos ServerApi");
+        ctx.SendMessage("/tbxcombat - damage/heal/knockback");
+        ctx.SendMessage("/tbxinteract - items pour tester interactions");
+        ctx.SendMessage("/tbxblocks - blocks, biome, lumiere, liquides");
+        ctx.SendMessage("/tbxentities - visibilite/entity helpers");
+        ctx.SendMessage("/tbxworldstate - temps, spawn, difficulte, dimension");
         ctx.SendMessage("/tbxkit <count> [name] - commande a parametres");
         ctx.SendMessage("/tbxeffect <speed|jumpboost|nightvision> [seconds]");
         ctx.SendMessage("/tbxecho <message...>");
@@ -163,6 +183,119 @@ internal static class ExampleCommands
         ctx.SendMessage($"Entities radius 8={nearbyEntities}, overworldRange={DimensionApi.GetRange(overworld)}, netherWaterEvaporates={DimensionApi.DoesWaterEvaporate(custom)}");
     }
 
+    private static void Server(CommandContext ctx, Player player, ToolboxPlugin plugin)
+    {
+        var server = plugin.Server();
+        var tx = ctx.GetTransaction();
+        var online = ServerApi.GetOnlinePlayers(server, tx).Select(PlayerApi.GetName).ToArray();
+        var byName = ServerApi.GetPlayerByName(server, PlayerApi.GetName(player));
+        var byUuid = ServerApi.GetPlayer(server, PlayerApi.GetUniqueId(player));
+        var byXuid = ServerApi.GetPlayerByXuid(server, PlayerApi.GetXuid(player));
+
+        ctx.SendMessage($"Server players={ServerApi.GetOnlineCount(server)}/{ServerApi.GetMaxPlayers(server)} online=[{string.Join(", ", online)}]");
+        ctx.SendMessage($"Worlds: overworld={WorldApi.GetName(ServerApi.GetOverworld(server))}, nether={WorldApi.GetName(ServerApi.GetNether(server))}, end={WorldApi.GetName(ServerApi.GetEnd(server))}");
+        ctx.SendMessage($"Lookup self: name={byName.Ok} uuid={byUuid.Ok} xuid={byXuid.Ok}");
+    }
+
+    private static void Combat(Player player)
+    {
+        var before = PlayerApi.GetHealth(player);
+        var damage = PlayerApi.Damage(player, 1);
+        var healed = PlayerApi.Heal(player, 1);
+        PlayerApi.SetAbsorption(player, 2);
+        PlayerApi.KnockBack(player, PlayerApi.GetPosition(player), 0.25, 0.25);
+        SoundApi.PlaySound(player, SoundApi.CreateAttackSound(damage.Vulnerable));
+        PlayerApi.SendMessage(player, $"Combat test: health {before:0.0}->{PlayerApi.GetHealth(player):0.0}, damage={damage.Damage:0.0}, healed={healed:0.0}, vulnerable={damage.Vulnerable}");
+    }
+
+    private static void Interact(Player player)
+    {
+        InventoryApi.GiveItem(player, ItemFactory.CreateBuilder(new Item.Apple(), 4).SetCustomName("Toolbox consume test").Build());
+        InventoryApi.GiveItem(player, ItemFactory.CreateBuilder(new Item.Bow()).SetCustomName("Toolbox release test").Build());
+        InventoryApi.GiveItem(player, ItemFactory.CreateBuilder(new Item.FlintAndSteel()).SetCustomName("Toolbox use-on-block test").Build());
+        InventoryApi.GiveItem(player, ItemFactory.CreateBuilder(new Item.Pickaxe(Item.ToolTierDiamond)).SetCustomName("Toolbox break test").Build());
+        InventoryApi.GiveItem(player, ItemFactory.CreateBuilder(new Item.Sword(Item.ToolTierDiamond)).SetCustomName("Toolbox attack test").Build());
+        PlayerApi.AddExperience(player, 1);
+        PlayerApi.SendMessage(player, "Interaction test: mange la pomme, charge l'arc, pose/use le briquet, casse un block, drop/pickup un item, change de slot.");
+    }
+
+    private static void Blocks(CommandContext ctx, Player player)
+    {
+        var tx = ctx.GetTransaction();
+        if (tx is null)
+        {
+            ctx.SendError("Cette commande a besoin d'une transaction world.");
+            return;
+        }
+
+        var pos = PlayerApi.GetBlockPosition(player);
+        var block = BlockApi.GetBlock(tx, pos);
+        var loaded = BlockApi.GetLoadedBlock(tx, pos);
+        var liquid = BlockApi.GetLiquid(tx, pos);
+        var range = BlockApi.GetRange(tx);
+        var biome = BlockApi.GetBiome(tx, pos);
+        var highest = BlockApi.GetHighestBlock(tx, pos.X(), pos.Z());
+        var light = BlockApi.GetLight(tx, pos);
+        var skyLight = BlockApi.GetSkyLight(tx, pos);
+        var raining = BlockApi.IsRainingAt(tx, pos);
+        var snowing = BlockApi.IsSnowingAt(tx, pos);
+        var thundering = BlockApi.IsThunderingAt(tx, pos);
+        var temperature = BlockApi.GetTemperature(tx, pos);
+
+        ctx.SendMessage($"Block pos={pos} type={block.GetType().Name} loaded={loaded.Ok} outOfBounds={BlockApi.IsOutOfBounds(tx, pos)} range={range}");
+        ctx.SendMessage($"World scan: highest={highest} light={light}/{skyLight} biome={biome.GetType().Name} temp={temperature:0.00}");
+        ctx.SendMessage($"Weather at pos: raining={raining} snowing={snowing} thundering={thundering} liquid={liquid.Ok}");
+    }
+
+    private static void Entities(CommandContext ctx, Player player)
+    {
+        var tx = ctx.GetTransaction();
+        if (tx is null)
+        {
+            ctx.SendError("Cette commande a besoin d'une transaction world.");
+            return;
+        }
+
+        var entities = EntityApi.GetNearbyEntities(tx, PlayerApi.GetPosition(player), 16).ToArray();
+        var handle = EntityApi.GetHandle(player);
+        var resolved = EntityApi.GetEntity(handle, tx);
+
+        EntityApi.ViewNameTag(player, player, "Toolbox self nametag");
+        EntityApi.ViewScoreTag(player, player, $"entities={entities.Length}");
+        EntityApi.ViewVisibility(player, player, EntityVisibility.ForceVisible);
+        EntityApi.RemoveViewLayer(player, player);
+        EntityApi.ViewPublicNameTag(player, player);
+        EntityApi.ViewPublicScoreTag(player, player);
+
+        ctx.SendMessage($"Entities nearby={entities.Length}, selfHandleClosed={EntityApi.IsClosed(handle)}, selfUuid={EntityApi.GetUniqueId(handle)}, resolvedSelf={resolved.Ok}");
+    }
+
+    private static void WorldState(CommandContext ctx, Player player)
+    {
+        var tx = ctx.GetTransaction();
+        if (tx is null)
+        {
+            ctx.SendError("Cette commande a besoin d'une transaction world.");
+            return;
+        }
+
+        var world = WorldApi.GetWorld(tx);
+        var spawn = WorldApi.GetSpawn(world);
+        var playerSpawn = WorldApi.GetPlayerSpawn(world, player);
+        var difficulty = WorldApi.GetDifficulty(world);
+        var difficultyId = WorldApi.GetDifficultyId(difficulty);
+        var time = WorldApi.GetTime(world);
+        var dimension = WorldApi.GetDimension(world);
+        var custom = DimensionApi.CreateCustomDimension(-32, 128, timeCycle: false);
+
+        WorldApi.SetPlayerSpawn(world, player, PlayerApi.GetBlockPosition(player));
+        WorldApi.SetTime(world, 6000);
+        WorldApi.SetDifficulty(world, difficulty);
+
+        ctx.SendMessage($"World state: spawn={spawn}, playerSpawnBefore={playerSpawn}, time={time}->6000, difficultyId={difficultyId.Id}/{difficultyId.Ok}");
+        ctx.SendMessage($"Dimension: range={DimensionApi.GetRange(dimension)}, waterEvaporates={DimensionApi.DoesWaterEvaporate(dimension)}, customRange={custom.BuildRange}, customTimeCycle={custom.HasTimeCycle}");
+    }
+
     private static void Tasks(CommandContext ctx, Player player, ExampleState state)
     {
         var tx = ctx.GetTransaction();
@@ -199,6 +332,12 @@ internal static class ExampleCommands
     {
         state.SetPacketLogEnabled(!state.PacketLogEnabled);
         PlayerApi.SendMessage(player, $"Packet log={state.PacketLogEnabled}. Dernier packet: {state.LastPacket}");
+    }
+
+    private static void ToggleEventDiagnostics(Player player, ExampleState state)
+    {
+        state.SetEventDiagnosticsEnabled(!state.EventDiagnosticsEnabled);
+        PlayerApi.SendMessage(player, $"Event diagnostics={state.EventDiagnosticsEnabled}. Dernier event: {state.LastEvent}");
     }
 }
 

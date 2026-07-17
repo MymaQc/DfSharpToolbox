@@ -8,6 +8,7 @@ Commandes utiles:
 - `/tbxprofile`: affiche les informations joueur.
 - `/tbxitems`: teste items, NBT, inventaire, armure et cooldown.
 - `/tbxforms`: ouvre une simple form, une modal et une custom form.
+- `/tbxinv`: ouvre un faux inventaire interactif avec callbacks, valeurs et mise a jour.
 - `/tbxui`: teste title, toast, scoreboard, HUD et input locks.
 - `/tbxworld`: teste monde, blocks, entites et dimensions.
 - `/tbxtask`: lance des tasks immediate, delayed et repeating.
