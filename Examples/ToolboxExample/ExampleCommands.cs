@@ -66,7 +66,7 @@ internal static class ExampleCommands
         ctx.SendMessage("/tbxworld - monde, blocks, entites, dimensions");
         ctx.SendMessage("/tbxtask - task immediate/later/repeating");
         ctx.SendMessage("/tbxpacketlog - inspecte les packets via events");
-        ctx.SendMessage("/tbxconfig <show|write|reload|defaults|remove|reset> [value] - config JSON");
+        ctx.SendMessage("/tbxconf <show|write|reload|defaults|remove|reset> [value] - config JSON");
         ctx.SendMessage("/tbxevents - inspecte les events rares en console/tip");
         ctx.SendMessage("/tbxserver - infos ServerApi");
         ctx.SendMessage("/tbxcombat - damage/heal/knockback");

@@ -16,9 +16,9 @@ internal static class ExampleConfigDemo
     {
         ToolboxConfigCommand.Config = config;
         CommandApi.RegisterCommand<ToolboxConfigCommand>(
-            "tbxconfig",
+            "tbxconf",
             "Teste JsonConfig: <show|write|reload|defaults|remove|reset> [value].",
-            "tbxconf");
+            "tbxconfig");
     }
 
     public static IReadOnlyDictionary<string, object?> CreateDefaults()
