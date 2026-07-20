@@ -23,7 +23,7 @@ namespace ToolboxExample;
 
 internal static class ExampleCommands
 {
-    public static void Register(ToolboxPlugin plugin, ExampleState state)
+    public static void Register(ToolboxPlugin plugin, ExampleState state, ExampleCustomItemSet? customItems, ExampleCustomBlockSet? customBlocks)
     {
         ToolboxKitCommand.State = state;
         ToolboxEffectCommand.State = state;
@@ -31,6 +31,14 @@ internal static class ExampleCommands
         CommandApi.RegisterCommand("tbxhelp", "Affiche les commandes de test Toolbox.", ShowHelp, "tbx");
         CommandApi.RegisterPlayerCommand("tbxprofile", "Teste PlayerApi et les snapshots joueur.", ShowProfile);
         CommandApi.RegisterPlayerCommand("tbxitems", "Teste ItemFactory, ItemNbtApi, InventoryApi et ItemCooldownApi.", (_, player) => GiveItems(player));
+        if (customItems is { } items)
+        {
+            CommandApi.RegisterPlayerCommand("tbxcustomitem", "Donne des items personnalises avec composants.", (_, player) => GiveCustomItems(player, items));
+        }
+        if (customBlocks is { } blocks)
+        {
+            CommandApi.RegisterPlayerCommand("tbxcustomblock", "Donne trois blocs personnalises placables.", (_, player) => GiveCustomBlocks(player, blocks));
+        }
         CommandApi.RegisterPlayerCommand("tbxforms", "Ouvre les forms Toolbox.", (_, player) => ExampleForms.OpenMain(player, state));
         CommandApi.RegisterPlayerCommand("tbxinv", "Ouvre un faux inventaire interactif.", (_, player) => ExampleInventoryMenus.Open(player));
         CommandApi.RegisterPlayerCommand("tbxui", "Teste TitleApi, ToastApi, ScoreboardApi et PlayerControlApi.", (_, player) => ShowUi(player));
@@ -60,6 +68,8 @@ internal static class ExampleCommands
         ctx.SendMessage("ToolboxExample:");
         ctx.SendMessage("/tbxprofile - infos joueur");
         ctx.SendMessage("/tbxitems - items, NBT, inventaire, cooldown");
+        ctx.SendMessage("/tbxcustomitem - arme, nourriture et armure custom avec composants");
+        ctx.SendMessage("/tbxcustomblock - blocs custom solide, lumineux et demi-hauteur");
         ctx.SendMessage("/tbxforms - simple/modal/custom forms");
         ctx.SendMessage("/tbxinv - faux conteneurs interactifs avec de vrais items");
         ctx.SendMessage("/tbxui - title, toast, scoreboard, HUD/input");
@@ -123,6 +133,32 @@ internal static class ExampleCommands
         PlayerApi.AddExperience(player, 15);
         SoundApi.PlaySound(player, ToolboxSound.LevelUp);
         PlayerApi.SendMessage(player, $"Items envoyes. NBT owner={owner}, cooldown golden apple={ItemCooldownApi.HasCooldown(player, apples)}");
+    }
+
+    private static void GiveCustomItems(Player player, ExampleCustomItemSet items)
+    {
+        var sword = CustomItemApi.CreateBuilder(items.Sword)
+            .SetLore("Degats: 8", "Durabilite: 850", "Brillance et tenue en main")
+            .SetTag("toolbox.custom_item", true)
+            .Build();
+        var apples = CustomItemApi.CreateBuilder(items.Apple, 4)
+            .SetLore("Restaure 6 points de faim", "Cooldown: 1 seconde")
+            .Build();
+        var helmet = CustomItemApi.CreateBuilder(items.Helmet)
+            .SetLore("Protection: 4", "Durabilite: 600", "Slot: tete")
+            .Build();
+        InventoryApi.GiveItem(player, sword);
+        InventoryApi.GiveItem(player, apples);
+        InventoryApi.GiveItem(player, helmet);
+        PlayerApi.SendMessage(player, "Epee, pommes et casque custom ajoutes.");
+    }
+
+    private static void GiveCustomBlocks(Player player, ExampleCustomBlockSet blocks)
+    {
+        InventoryApi.GiveItem(player, CustomBlockApi.CreateBuilder(blocks.Ruby, 16).SetLore("Bloc solide", "Hardness: 5").Build());
+        InventoryApi.GiveItem(player, CustomBlockApi.CreateBuilder(blocks.Lamp, 16).SetLore("Lumiere: 15", "Transparent").Build());
+        InventoryApi.GiveItem(player, CustomBlockApi.CreateBuilder(blocks.Pedestal, 16).SetLore("Collision demi-hauteur").Build());
+        PlayerApi.SendMessage(player, "Blocs custom ajoutes. Tu peux les placer et les casser normalement.");
     }
 
     public static void ShowUi(Player player)

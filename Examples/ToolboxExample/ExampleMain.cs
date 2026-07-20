@@ -1,3 +1,4 @@
+using Dragonfly;
 using Toolbox;
 using Toolbox.Configs;
 
@@ -6,7 +7,15 @@ namespace ToolboxExample;
 public sealed class ExampleMain : ToolboxPlugin
 {
     private readonly ExampleState _state = new();
+    private readonly ExampleCustomItemSet? _customItems;
+    private readonly ExampleCustomBlockSet? _customBlocks;
     private JsonConfig? _config;
+
+    public ExampleMain()
+    {
+        _customItems = null;
+        _customBlocks = ExampleCustomBlocks.Register();
+    }
 
     public override void OnEnable()
     {
@@ -15,7 +24,7 @@ public sealed class ExampleMain : ToolboxPlugin
         ExampleConfigDemo.Register(_config);
         ExampleListeners.Register(this, _state);
         ExampleEventDiagnostics.Register(this, _state);
-        ExampleCommands.Register(this, _state);
+        ExampleCommands.Register(this, _state, _customItems, _customBlocks);
         Console.WriteLine("ToolboxExample enabled. Use /tbxhelp in game.");
     }
 

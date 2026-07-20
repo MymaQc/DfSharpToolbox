@@ -1,6 +1,7 @@
 using Dragonfly;
 using Toolbox.Diagnostics;
 using Toolbox.Events;
+using Toolbox.Blocks;
 using DPacketContext = Dragonfly.Packet.Context;
 using DPacket = Dragonfly.Packet.Packet;
 
@@ -42,6 +43,7 @@ public abstract class ToolboxPlugin : Plugin
         }
 
         _events.ClearListeners();
+        CustomBlockApi.ClearCallbacks();
         _disabled = true;
     }
 
@@ -137,6 +139,7 @@ public abstract class ToolboxPlugin : Plugin
 
     public override void HandleBlockPlace(Player.Context ctx, Cube.Pos pos, World.Block block)
     {
+        CustomBlockApi.DispatchPlacing(ctx, pos, block);
         _eventDispatcher.HandleBlockPlace(ctx, pos, block);
     }
 
@@ -152,6 +155,7 @@ public abstract class ToolboxPlugin : Plugin
 
     public override void HandleItemUseOnBlock(Player.Context ctx, Cube.Pos pos, Cube.Face face, Vector3 clickPos)
     {
+        CustomBlockApi.DispatchInteract(ctx, pos, face, clickPos);
         _eventDispatcher.HandleItemUseOnBlock(ctx, pos, face, clickPos);
     }
 
