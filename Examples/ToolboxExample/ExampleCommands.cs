@@ -429,7 +429,7 @@ public sealed class ToolboxEffectCommand : PlayerToolboxCommand
             _ => Dragonfly.Effect.Speed,
         };
 
-        EffectApi.AddEffect(player, EffectApi.CreateEffectTicks(type, 1, seconds * 20));
+        EffectApi.AddEffect(player, EffectApi.Create(type, 1, seconds * 20));
         PlayerApi.SendMessage(player, $"Effect {Effect} applique pendant {seconds}s.");
         State?.RecordPacket($"Commande tbxeffect {Effect} {seconds}s");
     }

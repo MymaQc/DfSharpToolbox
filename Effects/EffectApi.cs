@@ -13,7 +13,7 @@ public static class EffectApi
         return hideParticles ? effect.WithoutParticles() : effect;
     }
 
-    public static Effect.Value CreateEffectTicks(Effect.LastingType type, int level, long ticks, bool hideParticles = false, bool ambient = false)
+    public static Effect.Value Create(Effect.LastingType type, int level, long ticks, bool hideParticles = false, bool ambient = false)
     {
         return Create(type, level, TimeApi.ConvertGameTicksToDuration(ticks), hideParticles, ambient);
     }

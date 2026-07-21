@@ -39,7 +39,7 @@ internal static class ExampleListeners
             PlayerApi.SendMessage(ev.Player, $"Bienvenue {PlayerApi.GetName(ev.Player)}. Tape /tbxhelp.");
             ToastApi.SendToast(ev.Player, "ToolboxExample", $"Join #{state.JoinCount}");
             SoundApi.PlaySound(ev.Player, ToolboxSound.LevelUp);
-            EffectApi.AddEffect(ev.Player, EffectApi.CreateEffectTicks(Effect.Speed, 1, 100, hideParticles: true));
+            EffectApi.AddEffect(ev.Player, EffectApi.Create(Effect.Speed, 1, 100, hideParticles: true));
         });
 
         events.On<PlayerQuitEvent>(ev =>
