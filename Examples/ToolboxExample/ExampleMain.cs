@@ -9,6 +9,7 @@ public sealed class ExampleMain : ToolboxPlugin
     private readonly ExampleState _state = new();
     private readonly ExampleCustomItemSet? _customItems;
     private readonly ExampleCustomBlockSet? _customBlocks;
+    private readonly CustomEntityType<ExampleEntities.ExampleEntityMarker> _customEntity = ExampleEntities.Register();
     private JsonConfig? _config;
 
     public ExampleMain()
@@ -25,6 +26,7 @@ public sealed class ExampleMain : ToolboxPlugin
         ExampleListeners.Register(this, _state);
         ExampleEventDiagnostics.Register(this, _state);
         ExampleCommands.Register(this, _state, _customItems, _customBlocks);
+        ExampleEntities.RegisterCommand(_customEntity);
         Console.WriteLine("ToolboxExample enabled. Use /tbxhelp in game.");
     }
 

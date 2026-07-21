@@ -4,6 +4,17 @@ namespace Toolbox.Entities;
 
 public static class EntityApi
 {
+    public static CustomEntityType<TMarker> Define<TMarker>(string identifier, string networkIdentifier)
+    {
+        return new CustomEntityType<TMarker>(identifier, networkIdentifier);
+    }
+
+    public static EntitySpawnBuilder<TMarker> Spawn<TMarker>(CustomEntityType<TMarker> type, World.Tx transaction)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        return type.Spawn(transaction);
+    }
+
     public static Vector3 GetPosition(World.Entity entity)
     {
         return entity.Position();

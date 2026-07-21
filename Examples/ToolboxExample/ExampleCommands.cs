@@ -83,6 +83,7 @@ internal static class ExampleCommands
         ctx.SendMessage("/tbxinteract - items pour tester interactions");
         ctx.SendMessage("/tbxblocks - blocks, biome, lumiere, liquides");
         ctx.SendMessage("/tbxentities - visibilite/entity helpers");
+        ctx.SendMessage("/tbxentity - entite custom, proprietes et tick");
         ctx.SendMessage("/tbxworldstate - temps, spawn, difficulte, dimension");
         ctx.SendMessage("/tbxkit <count> [name] - commande a parametres");
         ctx.SendMessage("/tbxeffect <speed|jumpboost|nightvision> [seconds]");

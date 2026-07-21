@@ -13,6 +13,7 @@ Commandes utiles:
 - `/tbxinv`: ouvre un faux inventaire interactif avec callbacks, valeurs et mise a jour.
 - `/tbxui`: teste title, toast, scoreboard, HUD et input locks.
 - `/tbxworld`: teste monde, blocks, entites et dimensions.
+- `/tbxentity`: cree une entite custom dont le nom est actualise par son tick.
 - `/tbxtask`: lance des tasks immediate, delayed et repeating.
 - `/tbxpacketlog`: active/desactive l'inspection des packets dans la console.
 - `/tbxkit <count> [name]`: exemple de commande avec parametres.
@@ -156,3 +157,38 @@ var lamp = CustomBlockApi.Create("myplugin:lamp", "Lampe", texturePng)
 Les callbacks sont executes cote serveur par Toolbox. Les valeurs d'etat sont
 enregistrees comme de vrais variants Dragonfly et `WithState(...)` permet de passer
 d'un variant a l'autre. Le produit cartesien est limite a 4096 variants par bloc.
+
+## Entite personnalisee
+
+Les types d'entites doivent etre definis et enregistres dans le constructeur du
+plugin. L'identifiant reseau choisit l'entite vanilla affichee par le client.
+
+```csharp
+private readonly CustomEntityType<MyPlugin> _marker = EntityApi.Define<MyPlugin>(
+        "myplugin:marker",
+        "minecraft:armor_stand")
+    .DefaultProperty("seconds_alive", 0)
+    .BoundingBox(Cube.Box(-0.3, 0, -0.3, 0.3, 1.8, 0.3))
+    .TickEvery(20, tick =>
+    {
+        var seconds = tick.Properties.Get("seconds_alive", 0) + 1;
+        tick.Properties.Set("seconds_alive", seconds);
+        tick.NameTag = $"Actif depuis {seconds}s";
+    })
+    .Register();
+```
+
+Une entite peut ensuite etre creee depuis une transaction world:
+
+```csharp
+var spawned = EntityApi.Spawn(_marker, transaction)
+    .At(position)
+    .Rotated(rotation)
+    .Moving(new Vector3(0, 0.1, 0))
+    .NameTag("Mon entite")
+    .Property("owner", PlayerApi.GetName(player))
+    .Create();
+
+spawned.Properties.Set("custom_value", 42);
+spawned.Despawn(transaction);
+```
