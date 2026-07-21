@@ -203,7 +203,7 @@ internal static class ExampleCommands
 
         var world = WorldApi.GetWorld(tx);
         var position = PlayerApi.GetBlockPosition(player);
-        var target = PositionApi.AddToBlockPosition(position, 1, 0, 0);
+        var target = PositionApi.AddToBlockPosition(position, 1);
         var oldBlock = BlockApi.GetBlock(tx, target);
         var newBlock = BlockFactory.RequireBlockByName("minecraft:gold_block");
 

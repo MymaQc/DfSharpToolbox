@@ -1,7 +1,5 @@
 using Dragonfly;
 using Toolbox.Forms;
-using Toolbox.Inventories;
-using Toolbox.Items;
 using Toolbox.Players;
 using Toolbox.Presentation;
 using Toolbox.Sounds;
@@ -42,7 +40,7 @@ internal static class ExampleForms
             .AddLabel($"Derniere connexion: {state.LastConnection}")
             .AddToggle("packet_log", "Logger les packets", state.PacketLogEnabled)
             .AddSlider("speed", "Vitesse", 0.1, 1.0, 0.1, PlayerApi.GetSpeed(player))
-            .AddDropdown("sound", "Son de test", ["LevelUp", "Click", "Pop"], 0)
+            .AddDropdown("sound", "Son de test", ["LevelUp", "Click", "Pop"])
             .OnSubmit((response, submitter, _) =>
             {
                 if (submitter is not Player submittedPlayer)
